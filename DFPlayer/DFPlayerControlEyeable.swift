@@ -8,9 +8,9 @@
 
 import UIKit
 
-protocol DFPlayerStateEyeable: class {
+protocol DFPlayerControlEyeable: class {
     // @required
-    var container: UIView { get }
+    var cp_container: UIView { get }
     
     // @optional
     var playButton: UIButton { get }
@@ -21,12 +21,12 @@ protocol DFPlayerStateEyeable: class {
     var loadedProgress: UIProgressView { get }
     var playingSlider: UISlider { get }
     
-    /* for layout & style */
-    func setupPlayerStateUI()
-    
     func didTapPlayButton()
     func didTapBackButton()
     func titleForVideo() -> String
+    
+    /* for layout & style */
+    func setupPlayerControlPanel()
 }
 
 // DFPlayerStateEyeable: Default Implementaion
@@ -44,7 +44,7 @@ private class DFAssociation: NSObject {
     
 }
 
-extension DFPlayerStateEyeable {
+extension DFPlayerControlEyeable {
     
     var playButton: UIButton {
         get {
@@ -87,14 +87,22 @@ extension DFPlayerStateEyeable {
             return DFAssociation.sharedInstance.playingSlider
         }
     }
+
+    func didTapPlayButton() {}
     
-    func setupPlayerStateUI() {
+    func didTapBackButton() {}
+    
+    func titleForVideo() -> String {
+        return ""
+    }
+    
+    func setupPlayerControlPanel() {
         
-        container.df_addSubviews([playButton, backButton, titleLabel, currentSecondLabel, durationSecondsLabel, loadedProgress, playingSlider])
+        cp_container.df_addSubviews([playButton, backButton, titleLabel, currentSecondLabel, durationSecondsLabel, loadedProgress, playingSlider])
         
         backButton.snp_makeConstraints { (make) in
-            make.centerY.equalTo(container.snp_top).offset(64/2)
-            make.centerX.equalTo(container.snp_left).offset(16+6)
+            make.centerY.equalTo(cp_container.snp_top).offset(64/2)
+            make.centerX.equalTo(cp_container.snp_left).offset(16+6)
             make.width.height.equalTo(64)
         }
         backButton.setImage(UIImage(named: "back"), forState: .Normal)
@@ -111,8 +119,8 @@ extension DFPlayerStateEyeable {
         titleLabel.text = titleForVideo()
         
         playButton.snp_makeConstraints { (make) in
-            make.left.equalTo(container).offset(16)
-            make.centerY.equalTo(container.snp_bottom).offset(-20)
+            make.left.equalTo(cp_container).offset(16)
+            make.centerY.equalTo(cp_container.snp_bottom).offset(-20)
             make.width.height.equalTo(30)
         }
         playButton.setImage(UIImage(named: "to_play"), forState: .Normal)
@@ -134,7 +142,7 @@ extension DFPlayerStateEyeable {
         currentSecondLabel.text = "00:00"
         
         durationSecondsLabel.snp_makeConstraints { (make) in
-            make.right.equalTo(container).offset(-16)
+            make.right.equalTo(cp_container).offset(-16)
             make.centerY.equalTo(playButton)
         }
         durationSecondsLabel.font = UIFont.systemFontOfSize(12)
@@ -155,29 +163,10 @@ extension DFPlayerStateEyeable {
         playingSlider.snp_makeConstraints { (make) in
             make.edges.equalTo(loadedProgress)
         }
-
+        
         playingSlider.value = 0
     }
-
-    func didTapPlayButton() {}
-    func didTapBackButton() {}
-    
-    func titleForVideo() -> String {
-        return ""
-    }
 }
-
-
-
-
-private extension UIView {
-    func df_addSubviews(subviews: [UIView]) {
-        for view in subviews {
-            self.addSubview(view)
-        }
-    }
-}
-
 
 private class DFTimeSlider: UISlider {
     override func trackRectForBounds(bounds: CGRect) -> CGRect {
@@ -196,6 +185,14 @@ private class DFTimeSlider: UISlider {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+private extension UIView {
+    func df_addSubviews(subviews: [UIView]) {
+        for view in subviews {
+            self.addSubview(view)
+        }
     }
 }
 

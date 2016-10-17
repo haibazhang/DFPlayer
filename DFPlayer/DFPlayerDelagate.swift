@@ -14,8 +14,8 @@ protocol DFPlayerDelagate: class {
     func durationSeconds(second: Int)
     func loadedSecondsDidChange(seconds: Int)
     func currentSecondDidChange(seconds: Int)
-    func startBuffering()
-    func stopBuffering()
+    func startLoading()
+    func stopLoading()
     func didPlay()
     func didPause()
     func didStart()
@@ -28,8 +28,8 @@ extension DFPlayerDelagate {
     func durationSeconds(seconds: Int) {}
     func loadedSecondsDidChange(seconds: Int) {}
     func currentSecondDidChange(second: Int) {}
-    func startBuffering() {}
-    func stopBuffering() {}
+    func startLoading() {}
+    func stopLoading() {}
     func didPlay() {}
     func didPause() {}
     func didStart() {}

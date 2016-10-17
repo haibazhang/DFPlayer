@@ -33,9 +33,9 @@ class PlayerViewController: UIViewController {
         view.backgroundColor = UIColor.whiteColor()
         setupPlayerView()
         
-        setupBufferingView()
+        setupLoadingView()
         
-        setupPlayerStateUI()
+        setupPlayerControlPanel()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -60,8 +60,16 @@ class PlayerViewController: UIViewController {
     }
 }
 
-extension PlayerViewController: DFPlayerStateEyeable {
-    var container: UIView {
+extension PlayerViewController: DFPlayerLoadingEyeable {
+    var lv_container: UIView {
+        get {
+            return self.player.playerView
+        }
+    }
+}
+
+extension PlayerViewController: DFPlayerControlEyeable {
+    var cp_container: UIView {
         get {
             return self.player.playerView
         }
@@ -105,14 +113,14 @@ extension PlayerViewController: DFPlayerDelagate {
         return "video title"
     }
     
-    func startBuffering() {
-        bufferingView.hidden = false
-        bufferingView.startAnimation()
+    func startLoading() {
+        loadingView.hidden = false
+        loadingView.startAnimation()
     }
     
-    func stopBuffering() {
-        bufferingView.hidden = true
-        bufferingView.stopAnimation()
+    func stopLoading() {
+        loadingView.hidden = true
+        loadingView.stopAnimation()
     }
     
     func didPlay() {
@@ -141,13 +149,6 @@ extension PlayerViewController: DFPlayerDelagate {
     }
 }
 
-extension PlayerViewController: DFPlayerBufferingEyeable {
-    var bf_container: UIView {
-        get {
-            return self.player.playerView
-        }
-    }
-}
 
 
 private extension Int {

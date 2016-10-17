@@ -1,5 +1,5 @@
 //
-//  DFPlayerBufferingEyeable.swift
+//  DFPlayerLoadingEyeable.swift
 //  DFPlayer
 //
 //  Created by Difff on 16/10/17.
@@ -9,10 +9,10 @@
 import UIKit
 import NVActivityIndicatorView
 
-protocol DFPlayerBufferingEyeable: class {
-    var bf_container: UIView { get }
-    var bufferingView: NVActivityIndicatorView { get }
-    func setupBufferingView()
+protocol DFPlayerLoadingEyeable: class {
+    var lv_container: UIView { get }
+    var loadingView: NVActivityIndicatorView { get }
+    func setupLoadingView()
 }
 
 private class DFAssociation: NSObject {
@@ -22,19 +22,19 @@ private class DFAssociation: NSObject {
     let bufferingView = NVActivityIndicatorView(frame: CGRectZero, type: .BallRotateChase, color: UIColor.whiteColor(), padding: 0)
 }
 
-extension DFPlayerBufferingEyeable {
-    var bufferingView: NVActivityIndicatorView {
+extension DFPlayerLoadingEyeable {
+    var loadingView: NVActivityIndicatorView {
         get {
             return DFAssociation.sharedInstance.bufferingView
         }
     }
     
-    func setupBufferingView() {
-        bf_container.addSubview(bufferingView)
-        bufferingView.snp_makeConstraints { (make) in
-            make.center.equalTo(bf_container)
+    func setupLoadingView() {
+        lv_container.addSubview(loadingView)
+        loadingView.snp_makeConstraints { (make) in
+            make.center.equalTo(lv_container)
             make.width.height.equalTo(36)
         }
-        bufferingView.stopAnimation()
+        loadingView.stopAnimation()
     }
 }
