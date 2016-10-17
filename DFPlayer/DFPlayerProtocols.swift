@@ -201,6 +201,7 @@ private extension UIView {
     }
 }
 
+
 private class DFTimeSlider: UISlider {
     override func trackRectForBounds(bounds: CGRect) -> CGRect {
         // change height
