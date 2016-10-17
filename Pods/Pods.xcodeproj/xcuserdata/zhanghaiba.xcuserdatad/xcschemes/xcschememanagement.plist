@@ -4,6 +4,11 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>NVActivityIndicatorView.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Pods-DFPlayer.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -22,17 +27,22 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>4C75E61F8E15BE0D513A63F61FBC21A3</key>
+		<key>01DE5E748E3578D668258AB6EEB1FCCC</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>561F73171C0553309B9E3FDCEE12EBD1</key>
+		<key>8378B8BD1DFD6C1C407F121B7F1DD90B</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>E5B0A7972E6DA05110F8C01D9F27AAD6</key>
+		<key>8698C4558AE758AD92477EC134E714F7</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>F5FDE1A91B78730E7ACD60198910A57D</key>
 		<dict>
 			<key>primary</key>
 			<true/>

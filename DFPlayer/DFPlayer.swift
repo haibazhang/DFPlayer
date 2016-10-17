@@ -10,11 +10,13 @@ import UIKit
 import AVFoundation
 
 enum DFPlayerState: String {
-    case Init = "Init"
+    case Stop = "Stop"
+    case Start = "Start"
     case ReadyToPlay = "ReadyToPlay"
     case Failed = "Failed"
     case Playing = "Playing"
     case PauseByBuffer = "PauseByBuffer"
+    case PauseByUser = "PauseByUser"
 }
 
 private let status = "status"
@@ -26,15 +28,68 @@ class DFPlayer: NSObject {
     internal let playerView = DFPlayerView()
     
     // configure
-    var minimumBufferDurationToPlay: Int = 1
-    var autoPlay: Bool = true
+    internal var minimumBufferDurationToPlay: Int = 1
+    internal var autoStart: Bool = true
+
+    
+    private var _state: DFPlayerState = .Stop
+    private(set) var state: DFPlayerState {
+        set {
+            guard _state != newValue else { return }
+            
+            print("DFPlayer: status = \(newValue)")
+
+            let oldValue = _state
+            
+            _state = newValue
+            
+            delegate?.playerStatusDidChange(newValue)
+            
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                // for buffering
+                if newValue == .Start {
+                    let delayTime = dispatch_time(DISPATCH_TIME_NOW, Int64(0.5 * Double(NSEC_PER_SEC)))
+                    dispatch_after(delayTime, dispatch_get_main_queue(), {
+                        if self.state == .Start {
+                            self.delegate?.startBuffering()
+                        }
+                    })
+                } else if newValue == .PauseByBuffer {
+                    self.delegate?.startBuffering()
+                } else {
+                    self.delegate?.stopBuffering()
+                }
+                
+                
+                if oldValue == .Start && newValue == .PauseByUser {
+                    self.delegate?.stopBuffering()
+                }
+                
+                // for play|pause
+                if newValue == .Playing || newValue == .Start {
+                    self.delegate?.didPlay()
+                } else {
+                    self.delegate?.didPause()
+                }
+                
+            })
+        }
+        
+        
+        get {
+            return _state
+        }
+    }
+    
+    private(set) var durationSeconds: Int = 0
+    private(set) var loadedSeconds: Int = 0
+    private(set) var currentSecond: Int = 0
+    
     
     private weak var delegate: DFPlayerDelagate?
-    private var durationSeconds: Int = 0
-    private var loadedSeconds: Int = 0
-    private var currentSecond: Int = 0
     
-    var timeObserverToken: AnyObject?
+    private var timeObserverToken: AnyObject?
     
     override init() {
         fatalError("use init(:AVPlayerItem)")
@@ -49,7 +104,6 @@ class DFPlayer: NSObject {
         removePeriodicTimeObserver()
     }
 
-
     init(playerItem: AVPlayerItem, delegate: DFPlayerDelagate? = nil) {
         super.init()
 
@@ -59,19 +113,41 @@ class DFPlayer: NSObject {
         addObserverForPlayItem()
         
         self.delegate = delegate
-        delegate?.playerStatusDidChange(.Init)
+        
+        if autoStart {
+            start()
+        } else {
+            stop()
+        }
     }
     
-    func itemDurationSeconds() -> Int {
-        return durationSeconds
+    internal func play() {
+        playerView.player?.play()
+        state = .Playing
     }
     
-    func addObserverForPlayItem() {
+    internal func pause() {
+        playerView.player?.pause()
+        state = .PauseByUser
+    }
+    
+    internal func stop() {
+        playerView.player?.replaceCurrentItemWithPlayerItem(nil)
+        state = .Stop
+    }
+    
+    internal func start() {
+        if playerView.player?.currentItem == nil {
+            playerView.player?.replaceCurrentItemWithPlayerItem(playerItem)
+        }
+        state = .Start
+    }
+    
+    private func addObserverForPlayItem() {
         playerItem.addObserver(self, forKeyPath: status, options: [.Initial, .New], context: nil)
-        playerItem.addObserver(self, forKeyPath: loadedTimeRanges, options: [.Initial, .New], context: nil)
     }
     
-    func removeObserverForPlayItem() {
+    private func removeObserverForPlayItem() {
         playerItem.removeObserver(self, forKeyPath: status)
         playerItem.removeObserver(self, forKeyPath: loadedTimeRanges)
     }
@@ -84,40 +160,41 @@ class DFPlayer: NSObject {
             case .Unknown:
                 break
             case .ReadyToPlay:
-                delegate?.playerStatusDidChange(.ReadyToPlay)
+                state = .ReadyToPlay
+
 
                 durationSeconds = Int(playerItem.duration.value) / Int(playerItem.duration.timescale)
 
                 delegate?.durationSeconds(durationSeconds)
                 
-                if (autoPlay) {
-                    playerView.player?.play()
-                }
+                play()
                 
+                playerItem.addObserver(self, forKeyPath: loadedTimeRanges, options: [.Initial, .New], context: nil)
                 addPeriodicTimeObserver(playerItem)
                 
                 break
             case .Failed:
-                delegate?.playerStatusDidChange(.Failed)
+                state = .Failed
                 break
             }
             
         } else if keyPath == loadedTimeRanges {
             
-            loadedSeconds = self.countLoadedSecond()
+            loadedSeconds = countLoadedSecond()
             
             delegate?.loadedSecondsDidChange(loadedSeconds)
             
-            if currentSecond >= loadedSeconds {
-                delegate?.playerStatusDidChange(.PauseByBuffer)
+            if currentSecond != 0 && currentSecond >= loadedSeconds {
+                state = .PauseByBuffer
             } else if loadedSeconds - currentSecond >= minimumBufferDurationToPlay {
-                // auto play
-                playerView.player?.play()
+                if state == .PauseByBuffer {
+                    play()
+                }
             }
         }
     }
     
-    func addPeriodicTimeObserver(playerItem: AVPlayerItem) {
+    private func addPeriodicTimeObserver(playerItem: AVPlayerItem) {
         timeObserverToken = self.playerView.player?.addPeriodicTimeObserverForInterval(CMTime(value: 1, timescale: 1), queue: nil, usingBlock: { [weak self](time) in
             
             guard let _self = self else { return }
@@ -125,18 +202,21 @@ class DFPlayer: NSObject {
             _self.currentSecond = Int(playerItem.currentTime().value) / Int(playerItem.currentTime().timescale)
             _self.delegate?.currentSecondDidChange(_self.currentSecond)
             
-            _self.delegate?.playerStatusDidChange(.Playing)
+            if _self.state == .PauseByUser {
+                return
+            }
+            _self.state = .Playing
         })
     }
     
-    func removePeriodicTimeObserver() {
+    private func removePeriodicTimeObserver() {
         // If a time observer exists, remove it
         guard let token = timeObserverToken else { return }
         self.playerView.player?.removeTimeObserver(token)
         timeObserverToken = nil
     }
     
-    func countLoadedSecond() -> Int {
+    private func countLoadedSecond() -> Int {
         let loadedTimeRanges = playerView.player?.currentItem?.loadedTimeRanges
         guard let timeRange = loadedTimeRanges?.first?.CMTimeRangeValue else { return 0 }
 

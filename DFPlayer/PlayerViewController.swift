@@ -33,6 +33,8 @@ class PlayerViewController: UIViewController {
         view.backgroundColor = UIColor.whiteColor()
         setupPlayerView()
         
+        setupBufferingView()
+        
         setupPlayerStateUI()
     }
     
@@ -67,27 +69,33 @@ extension PlayerViewController: DFPlayerStateEyeable {
 }
 
 extension PlayerViewController: DFPlayerDelagate {
-    func playerStatusDidChange(status: DFPlayerState) {
-        print("status: - \(status.rawValue)")
-    }
-    
     func durationSeconds(seconds: Int) {
         print("duration: - \(seconds) seconds")
         
-        setDurationSeconds(seconds)
-    }
-    
-    func loadedSecondsDidChange(seconds: Int) {
-        print("loaded: - \(seconds) seconds")
-        
-        setLoadedSeconds(seconds, duration: player.itemDurationSeconds())
+        durationSecondsLabel.text = seconds.toHourFormat()
     }
     
     func currentSecondDidChange(second: Int) {
         print("current: - \(second) second")
         
-        setCurrentSecond(second, duration: player.itemDurationSeconds())
+        currentSecondLabel.text = second.toHourFormat()
+        playingSlider.value = Float(second)/Float(player.durationSeconds)
     }
+    
+    func loadedSecondsDidChange(seconds: Int) {
+        print("loaded: - \(seconds) seconds")
+
+        
+        if seconds > player.durationSeconds {
+            fatalError("loaded > duration!!!")
+        }
+        
+        let duration = player.durationSeconds
+        guard seconds > 0 && seconds <= duration else { return }
+        let progress = Float(seconds)/Float(duration)
+        loadedProgress.setProgress(progress, animated: false)
+    }
+    
     
     func didTapBackButton() {
         self.navigationController?.popViewControllerAnimated(true)
@@ -96,6 +104,63 @@ extension PlayerViewController: DFPlayerDelagate {
     func titleForVideo() -> String {
         return "video title"
     }
+    
+    func startBuffering() {
+        bufferingView.hidden = false
+        bufferingView.startAnimation()
+    }
+    
+    func stopBuffering() {
+        bufferingView.hidden = true
+        bufferingView.stopAnimation()
+    }
+    
+    func didPlay() {
+        playButton.selected = true
+    }
+    func didPause() {
+        playButton.selected = false
+    }
+    func didStart() {
+        playButton.selected = true
+    }
+    func didStop() {
+        playButton.selected = false
+    }
+    
+    func didTapPlayButton() {
+        if player.state == .Start {
+            player.stop()
+        } else if player.state == .Stop {
+            player.start()
+        } else if player.state == .Playing {
+            player.pause()
+        } else {
+            player.play()
+        }
+    }
 }
 
+extension PlayerViewController: DFPlayerBufferingEyeable {
+    var bf_container: UIView {
+        get {
+            return self.player.playerView
+        }
+    }
+}
+
+
+private extension Int {
+    func toHourFormat() -> String {
+        let hour = self/3600
+        let minute = self%3600/60
+        let second = self%3600%60
+        
+        if (hour > 0) {
+            return String(format: "%02d:%02d:%02d", hour, minute, second)
+        } else {
+            return String(format: "%02d:%02d", minute, second)
+        }
+    }
+}
 

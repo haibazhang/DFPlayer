@@ -15,7 +15,9 @@
 		50A169C21DAFCA7B002DE4FC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169C11DAFCA7B002DE4FC /* Constants.swift */; };
 		50A169C41DB06ADD002DE4FC /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169C31DB06ADD002DE4FC /* MainViewController.swift */; };
 		50A169CA1DB0725F002DE4FC /* DFPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169C91DB0725F002DE4FC /* DFPlayer.swift */; };
-		50A169CC1DB14639002DE4FC /* DFPlayerProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CB1DB14639002DE4FC /* DFPlayerProtocols.swift */; };
+		50A169CC1DB14639002DE4FC /* DFPlayerStateEyeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CB1DB14639002DE4FC /* DFPlayerStateEyeable.swift */; };
+		50A169CE1DB4D25D002DE4FC /* DFPlayerDelagate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */; };
+		50A169D01DB4D275002DE4FC /* DFPlayerBufferingEyeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CF1DB4D275002DE4FC /* DFPlayerBufferingEyeable.swift */; };
 		C24C065766790170F4841475 /* Pods_DFPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B0C476F82EE2A39CBD8559E /* Pods_DFPlayer.framework */; };
 /* End PBXBuildFile section */
 
@@ -31,7 +33,9 @@
 		50A169C11DAFCA7B002DE4FC /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		50A169C31DB06ADD002DE4FC /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		50A169C91DB0725F002DE4FC /* DFPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayer.swift; sourceTree = "<group>"; };
-		50A169CB1DB14639002DE4FC /* DFPlayerProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerProtocols.swift; sourceTree = "<group>"; };
+		50A169CB1DB14639002DE4FC /* DFPlayerStateEyeable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerStateEyeable.swift; sourceTree = "<group>"; };
+		50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerDelagate.swift; sourceTree = "<group>"; };
+		50A169CF1DB4D275002DE4FC /* DFPlayerBufferingEyeable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerBufferingEyeable.swift; sourceTree = "<group>"; };
 		A565C5EF011833CFAB084237 /* Pods-DFPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DFPlayer.release.xcconfig"; path = "Pods/Target Support Files/Pods-DFPlayer/Pods-DFPlayer.release.xcconfig"; sourceTree = "<group>"; };
 		EEA62E23AE157AEA0F7FED8D /* Pods-DFPlayer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DFPlayer.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DFPlayer/Pods-DFPlayer.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,7 +98,9 @@
 			children = (
 				50A169BF1DAFC4CF002DE4FC /* DFPlayerView.swift */,
 				50A169C91DB0725F002DE4FC /* DFPlayer.swift */,
-				50A169CB1DB14639002DE4FC /* DFPlayerProtocols.swift */,
+				50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */,
+				50A169CF1DB4D275002DE4FC /* DFPlayerBufferingEyeable.swift */,
+				50A169CB1DB14639002DE4FC /* DFPlayerStateEyeable.swift */,
 			);
 			name = Player;
 			sourceTree = "<group>";
@@ -230,12 +236,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				50A169C41DB06ADD002DE4FC /* MainViewController.swift in Sources */,
+				50A169D01DB4D275002DE4FC /* DFPlayerBufferingEyeable.swift in Sources */,
 				50A169C01DAFC4CF002DE4FC /* DFPlayerView.swift in Sources */,
 				50A169AD1DAFBCDC002DE4FC /* PlayerViewController.swift in Sources */,
-				50A169CC1DB14639002DE4FC /* DFPlayerProtocols.swift in Sources */,
+				50A169CC1DB14639002DE4FC /* DFPlayerStateEyeable.swift in Sources */,
 				50A169AB1DAFBCDC002DE4FC /* AppDelegate.swift in Sources */,
 				50A169C21DAFCA7B002DE4FC /* Constants.swift in Sources */,
 				50A169CA1DB0725F002DE4FC /* DFPlayer.swift in Sources */,
+				50A169CE1DB4D25D002DE4FC /* DFPlayerDelagate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,5 +1,5 @@
 //
-//  Protocol.swift
+//  DFPlayerStateEyeable.swift
 //  DFPlayer
 //
 //  Created by Difff on 16/10/15.
@@ -8,28 +8,12 @@
 
 import UIKit
 
-protocol DFPlayerDelagate: class {
-    // @optional
-    func playerStatusDidChange(status: DFPlayerState)
-    func durationSeconds(second: Int)
-    func loadedSecondsDidChange(seconds: Int)
-    func currentSecondDidChange(seconds: Int)
-}
-
-// DFPlayerDelagate: Default Implementaion
-extension DFPlayerDelagate {
-    func playerStatusDidChange(status: DFPlayerState) {}
-    func durationSeconds(seconds: Int) {}
-    func loadedSecondsDidChange(seconds: Int) {}
-    func currentSecondDidChange(second: Int) {}
-}
-
-
 protocol DFPlayerStateEyeable: class {
     // @required
     var container: UIView { get }
     
     // @optional
+    var playButton: UIButton { get }
     var backButton: UIButton { get }
     var titleLabel: UILabel { get }
     var currentSecondLabel: UILabel { get }
@@ -40,10 +24,7 @@ protocol DFPlayerStateEyeable: class {
     /* for layout & style */
     func setupPlayerStateUI()
     
-    func setDurationSeconds(seconds: Int)
-    func setCurrentSecond(second: Int, duration: Int)
-    func setLoadedSeconds(seconds: Int, duration: Int)
-    
+    func didTapPlayButton()
     func didTapBackButton()
     func titleForVideo() -> String
 }
@@ -52,15 +33,25 @@ protocol DFPlayerStateEyeable: class {
 private class DFAssociation: NSObject {
     static let sharedInstance = DFAssociation()
     private override init() {}
+    
+    let playButton = UIButton()
     let backButton = UIButton()
     let titleLabel = UILabel()
     let currentSecondLabel = UILabel()
     let durationSecondsLabel = UILabel()
     let loadedProgress = UIProgressView()
     let playingSlider = DFTimeSlider()
+    
 }
 
 extension DFPlayerStateEyeable {
+    
+    var playButton: UIButton {
+        get {
+            return DFAssociation.sharedInstance.playButton
+        }
+    }
+    
     var backButton: UIButton {
         get {
             return DFAssociation.sharedInstance.backButton
@@ -99,7 +90,7 @@ extension DFPlayerStateEyeable {
     
     func setupPlayerStateUI() {
         
-        container.df_addSubviews([backButton, titleLabel, currentSecondLabel, durationSecondsLabel, loadedProgress, playingSlider])
+        container.df_addSubviews([playButton, backButton, titleLabel, currentSecondLabel, durationSecondsLabel, loadedProgress, playingSlider])
         
         backButton.snp_makeConstraints { (make) in
             make.centerY.equalTo(container.snp_top).offset(64/2)
@@ -119,9 +110,23 @@ extension DFPlayerStateEyeable {
         titleLabel.textColor = UIColor.whiteColor()
         titleLabel.text = titleForVideo()
         
-        currentSecondLabel.snp_makeConstraints { (make) in
+        playButton.snp_makeConstraints { (make) in
             make.left.equalTo(container).offset(16)
             make.centerY.equalTo(container.snp_bottom).offset(-20)
+            make.width.height.equalTo(30)
+        }
+        playButton.setImage(UIImage(named: "to_play"), forState: .Normal)
+        playButton.setImage(UIImage(named: "to_pause"), forState: .Selected)
+        playButton.selected = false
+        playButton.addAction({ [weak self](_) in
+            guard let _self = self else { return }
+            _self.didTapPlayButton()
+            }, forControlEvents: .TouchUpInside)
+        
+        
+        currentSecondLabel.snp_makeConstraints { (make) in
+            make.left.equalTo(playButton.snp_right).offset(5)
+            make.centerY.equalTo(playButton)
             make.width.equalTo(35) // must
         }
         currentSecondLabel.font = UIFont.systemFontOfSize(12)
@@ -130,17 +135,16 @@ extension DFPlayerStateEyeable {
         
         durationSecondsLabel.snp_makeConstraints { (make) in
             make.right.equalTo(container).offset(-16)
-            make.centerY.equalTo(currentSecondLabel)
+            make.centerY.equalTo(playButton)
         }
         durationSecondsLabel.font = UIFont.systemFontOfSize(12)
         durationSecondsLabel.textColor = UIColor.whiteColor()
         durationSecondsLabel.text = "00:00"
         
-        
         loadedProgress.snp_makeConstraints { (make) in
             make.left.equalTo(currentSecondLabel.snp_right).offset(5)
             make.right.equalTo(durationSecondsLabel.snp_left).offset(-5)
-            make.centerY.equalTo(currentSecondLabel)
+            make.centerY.equalTo(playButton)
             make.height.equalTo(2.5)
         }
         
@@ -155,22 +159,7 @@ extension DFPlayerStateEyeable {
         playingSlider.value = 0
     }
 
-    
-    func setDurationSeconds(seconds: Int) {
-        durationSecondsLabel.text = seconds.toHourFormat()
-    }
-    
-    func setCurrentSecond(second: Int, duration: Int) {
-        currentSecondLabel.text = second.toHourFormat()
-        playingSlider.value = Float(second)/Float(duration)
-    }
-    
-    func setLoadedSeconds(seconds: Int, duration: Int) {
-        guard seconds > 0 && seconds <= duration else { return }
-        let progress = Float(seconds)/Float(duration)
-        loadedProgress.setProgress(progress, animated: false)
-    }
-    
+    func didTapPlayButton() {}
     func didTapBackButton() {}
     
     func titleForVideo() -> String {
@@ -179,19 +168,7 @@ extension DFPlayerStateEyeable {
 }
 
 
-private extension Int {
-    func toHourFormat() -> String {
-        let hour = self/3600
-        let minute = self%3600/60
-        let second = self%3600%60
-        
-        if (hour > 0) {
-            return String(format: "%02d:%02d:%02d", hour, minute, second)
-        } else {
-            return String(format: "%02d:%02d", minute, second)
-        }
-    }
-}
+
 
 private extension UIView {
     func df_addSubviews(subviews: [UIView]) {
@@ -221,8 +198,6 @@ private class DFTimeSlider: UISlider {
         fatalError("init(coder:) has not been implemented")
     }
 }
-
-
 
 
 
