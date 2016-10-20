@@ -144,9 +144,7 @@ extension PlayerViewController: DFPlayerDelagate {
     }
     
     func didPlayingSliderTouchEnd(sender: UISlider) {
-        
-        let endTime = Double(sender.value * Float(player.itemDurationSeconds))
-        
+        let endTime = Double(sender.value) * player.itemDurationSeconds
         player.seek(endTime)
     }
     

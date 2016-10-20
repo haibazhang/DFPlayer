@@ -15,12 +15,12 @@ class DFPlayerView: UIView {
     }
     
     internal var player: AVPlayer? {
-        get {
-            return (self.layer as! AVPlayerLayer).player
-        }
-        
         set {
             (self.layer as! AVPlayerLayer).player = newValue
+        }
+        
+        get {
+            return (self.layer as! AVPlayerLayer).player
         }
     }
     

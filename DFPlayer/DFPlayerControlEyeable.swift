@@ -48,6 +48,8 @@ private class DFAssociation: NSObject {
     let playingSlider = DFTimeSlider()
 }
 
+private let silderHeight: CGFloat = 2.5
+
 extension DFPlayerControlEyeable {
     
     var playButton: UIButton {
@@ -164,7 +166,7 @@ extension DFPlayerControlEyeable {
             make.left.equalTo(currentSecondLabel.snp_right).offset(5)
             make.right.equalTo(durationSecondsLabel.snp_left).offset(-5)
             make.centerY.equalTo(playButton)
-            make.height.equalTo(2.5)
+            make.height.equalTo(silderHeight)
         }
         
         loadedProgress.trackTintColor = UIColor.whiteColor()
@@ -200,25 +202,22 @@ extension DFPlayerControlEyeable {
 }
 
 private class DFTimeSlider: UISlider {
+    // custom height
     override func trackRectForBounds(bounds: CGRect) -> CGRect {
-        // change height
-        let customBounds = CGRect(origin: bounds.origin, size: CGSize(width: bounds.size.width, height: 2.5))
-        super.trackRectForBounds(customBounds)
-        return customBounds
+        super.trackRectForBounds(bounds)
+        return CGRect(origin: bounds.origin, size: CGSize(width: bounds.size.width, height: silderHeight))
     }
-    
-//    override func thumbRectForBounds(bounds: CGRect, trackRect rect: CGRect, value: Float) -> CGRect {
-//        super.thumbRectForBounds(bounds, trackRect: rect, value: value)
-//        let width: CGFloat = 30
-//        let height: CGFloat = 4
-//        return CGRect(x: rect.width*CGFloat(value)-CGFloat(12*(1-value)), y: -1, width: width, height: height)
-//    }
+
+    // increase click area("hot spot")
+    private override func pointInside(point: CGPoint, withEvent event: UIEvent?) -> Bool {
+        return CGRectContainsPoint(CGRectInset(bounds, -10, -15), point)
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.setThumbImage(UIImage(named: "slider_thumb"), forState: .Normal)
-        self.maximumTrackTintColor = UIColor.clearColor()
-        self.minimumTrackTintColor = UIColor.orangeColor()
+        maximumTrackTintColor = UIColor.clearColor()
+        minimumTrackTintColor = UIColor.orangeColor()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -234,22 +233,7 @@ private extension UIView {
     }
 }
 
-extension UISlider {
-    var df_touchMovie: Bool {
-        get {
-            return UISliderAssociation.sharedInstance.touchMovie
-        }
-        set {
-            UISliderAssociation.sharedInstance.touchMovie = newValue
-        }
-    }
-}
 
-private class UISliderAssociation: NSObject {
-    static let sharedInstance = UISliderAssociation()
-    private override init() {}
-    var touchMovie = false
-}
 
 
 

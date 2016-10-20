@@ -18,7 +18,7 @@ enum DFPlayerState: String {
 }
 
 private let status = "status"
-private let stateQueue = dispatch_queue_create("stateQueue.com", nil)
+private let stateQueue = dispatch_queue_create("com.difff.stateQueue", nil)
 
 class DFPlayer: NSObject {
 
@@ -93,6 +93,7 @@ class DFPlayer: NSObject {
         willSet {
             guard isFinished != newValue else { return }
             print("DFPlayer: isFinished = \(newValue)")
+            self.isWaitingBuffer = false
             dispatch_async(dispatch_get_main_queue()) {
                 if newValue {
                     self.delegate?.didFinished()
@@ -248,6 +249,7 @@ class DFPlayer: NSObject {
     }
     
     private func track() {
+        guard !isFinished else { return }
         countItemCurrentSecond()
         countItemLoadedSeconds()
         isWaitingBuffer =

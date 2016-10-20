@@ -21,13 +21,13 @@ private class DFAssociation: NSObject {
     static let sharedInstance = DFAssociation()
     private override init() {}
     
-    let bufferingView = NVActivityIndicatorView(frame: CGRectZero, type: .BallRotateChase, color: UIColor.whiteColor(), padding: 0)
+    let loadingView = NVActivityIndicatorView(frame: CGRectZero, type: .BallRotateChase, color: UIColor.whiteColor(), padding: 0)
 }
 
 extension DFPlayerLoadingEyeable {
     var loadingView: NVActivityIndicatorView {
         get {
-            return DFAssociation.sharedInstance.bufferingView
+            return DFAssociation.sharedInstance.loadingView
         }
     }
     
