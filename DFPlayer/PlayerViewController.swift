@@ -31,11 +31,12 @@ class PlayerViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.whiteColor()
+        
         setupPlayerView()
         
         setupLoadingView()
         
-        setupPlayerControlPanel()
+        setupControlPanel()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -77,31 +78,34 @@ extension PlayerViewController: DFPlayerControlEyeable {
 }
 
 extension PlayerViewController: DFPlayerDelagate {
-    func durationSeconds(seconds: Int) {
+    func durationSeconds(seconds: NSTimeInterval) {
         print("duration: - \(seconds) seconds")
         
-        durationSecondsLabel.text = seconds.toHourFormat()
+        durationSecondsLabel.text = Int(seconds).toHourFormat()
     }
     
-    func currentSecondDidChange(second: Int) {
+    func currentSecondDidChange(second: NSTimeInterval) {
         print("current: - \(second) second")
         
-        currentSecondLabel.text = second.toHourFormat()
-        playingSlider.value = Float(second)/Float(player.durationSeconds)
+        currentSecondLabel.text = Int(second).toHourFormat()
+        
+        if !playingSlider.df_touchMovie && !player.isSeeking {
+            playingSlider.value = Float(second/player.itemDurationSeconds)
+        }
     }
     
-    func loadedSecondsDidChange(seconds: Int) {
+    
+    func loadedSecondsDidChange(seconds: NSTimeInterval) {
         print("loaded: - \(seconds) seconds")
-
         
-        if seconds > player.durationSeconds {
+        if seconds > player.itemDurationSeconds {
             fatalError("loaded > duration!!!")
         }
         
-        let duration = player.durationSeconds
-        guard seconds > 0 && seconds <= duration else { return }
+        let duration = player.itemDurationSeconds
+        guard seconds >= 0 && duration > 0 else { return }
         let progress = Float(seconds)/Float(duration)
-        loadedProgress.setProgress(progress, animated: false)
+        loadedProgress.setProgress(progress, animated: true)
     }
     
     
@@ -123,23 +127,14 @@ extension PlayerViewController: DFPlayerDelagate {
         loadingView.stopAnimation()
     }
     
-    func didPlay() {
-        playButton.selected = true
-    }
-    func didPause() {
-        playButton.selected = false
-    }
-    func didStart() {
-        playButton.selected = true
-    }
-    func didStop() {
-        playButton.selected = false
+    func playerStateDidChange(state: DFPlayerState) {
+        playButton.selected = (state == .Playing || state == .Starting)
     }
     
     func didTapPlayButton() {
-        if player.state == .Start {
+        if player.state == .Starting {
             player.stop()
-        } else if player.state == .Stop {
+        } else if player.state == .Stopped || player.state == .Failed {
             player.start()
         } else if player.state == .Playing {
             player.pause()
@@ -147,9 +142,15 @@ extension PlayerViewController: DFPlayerDelagate {
             player.play()
         }
     }
+    
+    func didPlayingSliderTouchEnd(sender: UISlider) {
+        
+        let endTime = Double(sender.value * Float(player.itemDurationSeconds))
+        
+        player.seek(endTime)
+    }
+    
 }
-
-
 
 private extension Int {
     func toHourFormat() -> String {

@@ -12,6 +12,8 @@ import NVActivityIndicatorView
 protocol DFPlayerLoadingEyeable: class {
     var lv_container: UIView { get }
     var loadingView: NVActivityIndicatorView { get }
+    
+    /* for layout & style */
     func setupLoadingView()
 }
 

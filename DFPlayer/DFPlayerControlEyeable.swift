@@ -21,12 +21,17 @@ protocol DFPlayerControlEyeable: class {
     var loadedProgress: UIProgressView { get }
     var playingSlider: UISlider { get }
     
-    func didTapPlayButton()
-    func didTapBackButton()
     func titleForVideo() -> String
     
+    func didTapPlayButton()
+    func didTapBackButton()
+    func didPlayingSliderTouchBegin(sender: UISlider)
+    func didPlayingSliderTouchMovie(sender: UISlider)
+    func didPlayingSliderTouchEnd(sender: UISlider)
+    
+    
     /* for layout & style */
-    func setupPlayerControlPanel()
+    func setupControlPanel()
 }
 
 // DFPlayerStateEyeable: Default Implementaion
@@ -41,7 +46,6 @@ private class DFAssociation: NSObject {
     let durationSecondsLabel = UILabel()
     let loadedProgress = UIProgressView()
     let playingSlider = DFTimeSlider()
-    
 }
 
 extension DFPlayerControlEyeable {
@@ -88,15 +92,22 @@ extension DFPlayerControlEyeable {
         }
     }
 
-    func didTapPlayButton() {}
-    
-    func didTapBackButton() {}
     
     func titleForVideo() -> String {
         return ""
     }
+
+    func didTapPlayButton() {}
     
-    func setupPlayerControlPanel() {
+    func didTapBackButton() {}
+    
+    func didPlayingSliderTouchBegin(sender: UISlider) {}
+    
+    func didPlayingSliderTouchMovie(sender: UISlider) {}
+    func didPlayingSliderTouchEnd(sender: UISlider) {}
+
+    
+    func setupControlPanel() {
         
         cp_container.df_addSubviews([playButton, backButton, titleLabel, currentSecondLabel, durationSecondsLabel, loadedProgress, playingSlider])
         
@@ -163,8 +174,28 @@ extension DFPlayerControlEyeable {
         playingSlider.snp_makeConstraints { (make) in
             make.edges.equalTo(loadedProgress)
         }
-        
         playingSlider.value = 0
+        
+        playingSlider.addAction({ [weak self](sender) in
+            guard let _self = self else { return }
+            guard let slider = sender as? UISlider else { return }
+            slider.df_touchMovie = true
+            _self.didPlayingSliderTouchBegin(slider)
+            }, forControlEvents: .TouchDown)
+        
+        playingSlider.addAction({ [weak self](sender) in
+            guard let _self = self else { return }
+            guard let slider = sender as? UISlider else { return }
+            _self.didPlayingSliderTouchMovie(slider)
+            }, forControlEvents: .ValueChanged)
+        
+        playingSlider.addAction({ [weak self](sender) in
+            guard let _self = self else { return }
+            guard let slider = sender as? UISlider else { return }
+            slider.df_touchMovie = false
+            _self.didPlayingSliderTouchEnd(slider)
+            }, forControlEvents: .TouchUpInside)
+        
     }
 }
 
@@ -176,13 +207,20 @@ private class DFTimeSlider: UISlider {
         return customBounds
     }
     
+//    override func thumbRectForBounds(bounds: CGRect, trackRect rect: CGRect, value: Float) -> CGRect {
+//        super.thumbRectForBounds(bounds, trackRect: rect, value: value)
+//        let width: CGFloat = 30
+//        let height: CGFloat = 4
+//        return CGRect(x: rect.width*CGFloat(value)-CGFloat(12*(1-value)), y: -1, width: width, height: height)
+//    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.setThumbImage(UIImage(named: "slider_thumb"), forState: .Normal)
         self.maximumTrackTintColor = UIColor.clearColor()
         self.minimumTrackTintColor = UIColor.orangeColor()
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -196,6 +234,22 @@ private extension UIView {
     }
 }
 
+extension UISlider {
+    var df_touchMovie: Bool {
+        get {
+            return UISliderAssociation.sharedInstance.touchMovie
+        }
+        set {
+            UISliderAssociation.sharedInstance.touchMovie = newValue
+        }
+    }
+}
+
+private class UISliderAssociation: NSObject {
+    static let sharedInstance = UISliderAssociation()
+    private override init() {}
+    var touchMovie = false
+}
 
 
 

@@ -10,30 +10,22 @@ import UIKit
 
 protocol DFPlayerDelagate: class {
     // @optional
-    func playerStatusDidChange(status: DFPlayerState)
-    func durationSeconds(second: Int)
-    func loadedSecondsDidChange(seconds: Int)
-    func currentSecondDidChange(seconds: Int)
+    func playerStateDidChange(state: DFPlayerState)
+    func durationSeconds(second: NSTimeInterval)
+    func loadedSecondsDidChange(seconds: NSTimeInterval)
+    func currentSecondDidChange(seconds: NSTimeInterval)
     func startLoading()
     func stopLoading()
-    func didPlay()
-    func didPause()
-    func didStart()
-    func didStop()
 }
 
 // DFPlayerDelagate: Default Implementaion
 extension DFPlayerDelagate {
-    func playerStatusDidChange(status: DFPlayerState) {}
-    func durationSeconds(seconds: Int) {}
-    func loadedSecondsDidChange(seconds: Int) {}
-    func currentSecondDidChange(second: Int) {}
+    func playerStateDidChange(state: DFPlayerState) {}
+    func durationSeconds(seconds: NSTimeInterval) {}
+    func loadedSecondsDidChange(seconds: NSTimeInterval) {}
+    func currentSecondDidChange(second: NSTimeInterval) {}
     func startLoading() {}
     func stopLoading() {}
-    func didPlay() {}
-    func didPause() {}
-    func didStart() {}
-    func didStop() {}
 }
 
 
