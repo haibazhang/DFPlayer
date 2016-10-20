@@ -22,10 +22,8 @@ private let stateQueue = dispatch_queue_create("stateQueue.com", nil)
 
 class DFPlayer: NSObject {
 
-
     private(set) var playerItem: AVPlayerItem!
     internal let playerView = DFPlayerView()
-
     
     // configure
     
@@ -49,7 +47,6 @@ class DFPlayer: NSObject {
             
             self.isLoading = detectIsLoading(newValue, isWaitingBuffer: self.isWaitingBuffer)
         }
-        
         get {
             var state: DFPlayerState = .Stopped
             dispatch_sync(stateQueue) {
@@ -59,21 +56,16 @@ class DFPlayer: NSObject {
         }
     }
     
-    var _isWaitingBuffer: Bool = false
-    private(set) var isWaitingBuffer: Bool {
-        set {
-            guard _isWaitingBuffer != newValue else { return }
-
+    private(set) var isWaitingBuffer: Bool = false {
+        willSet {
+            guard isWaitingBuffer != newValue else { return }
             print("DFPlayer: isWaitingBuffer = \(newValue)")
-
-            _isWaitingBuffer = newValue
-            
             dispatch_async(dispatch_get_main_queue()) {
                 if newValue {
-                    print("DFPlayer: waiting buffer...")
+                    print("DFPlayer: >>>>>> waiting buffer...")
                     self.playerView.player?.pause()
                 } else {
-                    print("DFPlayer: buffered, begin play")
+                    print("DFPlayer: <<<<<< buffered, likely to play")
                     if self.state != .Paused {
                         self.play()
                     }
@@ -81,52 +73,62 @@ class DFPlayer: NSObject {
                 self.isLoading = self.detectIsLoading(self.state, isWaitingBuffer: newValue)
             }
         }
-        
-        get {
-            return _isWaitingBuffer
-        }
     }
     
-    private var _isLoading = false
-    private(set) var isLoading: Bool {
-        set {
-            guard _isLoading != newValue else { return }
-            _isLoading = newValue
+    private(set) var isLoading: Bool = false {
+        willSet {
+            guard isLoading != newValue else { return }
             print("DFPlayer: isLoading = \(newValue)")
-            dispatch_async(dispatch_get_main_queue()) { 
-                if self._isLoading {
+            dispatch_async(dispatch_get_main_queue()) {
+                if newValue {
                     self.delegate?.startLoading()
                 } else {
                     self.delegate?.stopLoading()
                 }
             }
         }
-        get {
-            return _isLoading
-        }
     }
     
-    private var _isFinished: Bool = false
-    private(set) var isFinished: Bool {
-        set {
-            guard _isFinished != newValue else { return }
-            _isFinished = newValue
+    private(set) var isFinished: Bool = false {
+        willSet {
+            guard isFinished != newValue else { return }
             print("DFPlayer: isFinished = \(newValue)")
-            dispatch_async(dispatch_get_main_queue()) { 
-                if self._isFinished {
+            dispatch_async(dispatch_get_main_queue()) {
+                if newValue {
                     self.delegate?.didFinished()
                 }
             }
         }
-        get {
-            return _isFinished
+    }
+    
+    private(set) var itemDurationSeconds: NSTimeInterval = 0 {
+        willSet {
+            guard itemCurrentSecond != newValue else { return }
+            dispatch_async(dispatch_get_main_queue(), {
+                self.delegate?.durationSeconds(self.itemDurationSeconds)
+            })
         }
     }
     
+    private(set) var itemLoadedSeconds: NSTimeInterval = 0 {
+        willSet {
+            guard itemLoadedSeconds != newValue else { return }
+            dispatch_async(dispatch_get_main_queue(), {
+                self.delegate?.loadedSecondsDidChange(self.itemLoadedSeconds)
+            })
+        }
+    }
+    
+    private(set) var itemCurrentSecond: NSTimeInterval = 0 {
+        willSet {
+            guard itemCurrentSecond != newValue else { return }
+            dispatch_async(dispatch_get_main_queue(), {
+                self.delegate?.currentSecondDidChange(self.itemCurrentSecond)
+            })
+        }
+    }
+
     private(set) var seeking = false
-    private(set) var itemDurationSeconds: NSTimeInterval = 0
-    private(set) var itemLoadedSeconds: NSTimeInterval = 0
-    private(set) var itemCurrentSecond: NSTimeInterval = 0
     
     private weak var delegate: DFPlayerDelagate?
     private var timer: NSTimer?
@@ -192,18 +194,9 @@ class DFPlayer: NSObject {
         state = .Failed
     }
     
-    private func readyPlay() {
-        itemDurationSeconds = Double(playerItem.duration.value) / Double(playerItem.duration.timescale)
-        dispatch_async(dispatch_get_main_queue(), {
-            self.delegate?.durationSeconds(self.itemDurationSeconds)
-        })
-        addTimer()
-        play()
-    }
-    
     internal func seek(seekSecond: Double) {
         guard itemDurationSeconds > 0 && seekSecond < itemDurationSeconds else { return }
-        print("DFPlayer: >>>>>>>>>seeking begin >>>>>>>>>")
+        print("DFPlayer: >>>>>> seeking begin")
         
         seeking = true
         let time = CMTime(value: Int64(seekSecond), timescale: 1)
@@ -211,7 +204,7 @@ class DFPlayer: NSObject {
             self.playerView.player?.seekToTime(time, completionHandler: { [weak self](_) in
                 guard let _self = self else { return }
                 _self.seeking = false
-                print("DFPlayer: >>>>>>>>>seeking end >>>>>>>>>")
+                print("DFPlayer: <<<<<< seeking end")
             })
         }
     }
@@ -219,16 +212,8 @@ class DFPlayer: NSObject {
     private func addTimer() {
         timer = NSTimer.scheduledTimerWithTimeInterval(0.3, action: { [weak self](_) in
             guard let _self = self else { return }
-                _self.query()
+                _self.track()
             }, repeats: true)
-    }
-    
-    private func query() {
-        updateItemCurrentSecond()
-        updateItemLoadedSeconds()
-        isWaitingBuffer =
-            detectIsWaitingBuffer(currentSecond: itemCurrentSecond, loadedSeconds: itemLoadedSeconds)
-        isFinished = detectIsFinished(currentSecond: itemCurrentSecond)
     }
     
     private func removeTimer() {
@@ -254,20 +239,30 @@ class DFPlayer: NSObject {
                 setFailed()
                 break
             case .ReadyToPlay:
-                readyPlay()
+                countItemDurationSeconds()
+                addTimer()
+                play()
                 break
             }
         }
     }
     
-    // itemDurationSeconds > 0 | {currentSecond} => isFinished
+    private func track() {
+        countItemCurrentSecond()
+        countItemLoadedSeconds()
+        isWaitingBuffer =
+            detectIsWaitingBuffer(currentSecond: itemCurrentSecond, loadedSeconds: itemLoadedSeconds)
+        isFinished = detectIsFinished(currentSecond: itemCurrentSecond)
+    }
+    
+    // {currentSecond} => isFinished
     private func detectIsFinished(currentSecond currentSecond: Double) -> Bool {
         guard itemDurationSeconds > 0 else { return false }
         return fabs(itemDurationSeconds-currentSecond) < 1
     }
     
     // {state, isWaitingBuffer} => isLoading
-    func detectIsLoading(state: DFPlayerState, isWaitingBuffer: Bool) -> Bool {
+    private func detectIsLoading(state: DFPlayerState, isWaitingBuffer: Bool) -> Bool {
         if state == .Starting || (isWaitingBuffer && state == .Playing) {
             return true
         }
@@ -277,51 +272,36 @@ class DFPlayer: NSObject {
     // {currentSecond, loadedSeconds} => isWaitingBuffer
     private func detectIsWaitingBuffer(currentSecond currentSecond: Double, loadedSeconds: Double) -> Bool {
         
-        // fix bug
+        // for network throttling case
         if seeking {
-            return true
-        } else {
-            // should not return false
+            return true // else should not return false
         }
         
         guard itemLoadedSeconds > 0 else { return true }
-        
         let bufferRemain = itemLoadedSeconds - itemCurrentSecond
-        
         print("DFPlayer: bufferRemain - \(bufferRemain)")
         return bufferRemain <= self.minimumBufferRemainToPlay ? true : false
     }
     
-    private func updateItemCurrentSecond() {
-        let itemCurrentSecond = Double(playerItem.currentTime().value) / Double(playerItem.currentTime().timescale)
-        if self.itemCurrentSecond != itemCurrentSecond {
-            self.itemCurrentSecond = itemCurrentSecond
-            dispatch_async(dispatch_get_main_queue(), {
-                self.delegate?.currentSecondDidChange(self.itemCurrentSecond)
-            })
-        }
+    private func countItemDurationSeconds() {
+        itemDurationSeconds = Double(playerItem.duration.value) / Double(playerItem.duration.timescale)
     }
     
-    private func updateItemLoadedSeconds() {
+    private func countItemCurrentSecond() {
+        itemCurrentSecond = Double(playerItem.currentTime().value) / Double(playerItem.currentTime().timescale)
+    }
+    
+    private func countItemLoadedSeconds() {
         let loadedTimeRanges = playerView.player?.currentItem?.loadedTimeRanges
         guard let timeRange = loadedTimeRanges?.first?.CMTimeRangeValue else { return }
         
-        let startSeconds = Double(CMTimeGetSeconds(timeRange.start))
+        let startSecond = Double(CMTimeGetSeconds(timeRange.start))
         let durationSeconds = Double(CMTimeGetSeconds(timeRange.duration))
-        let loadedSecond = startSeconds + durationSeconds
+        let loadedSeconds = startSecond + durationSeconds
         
-        // loadedSecond may lager than itemDurationSeconds a litter bit
-        let itemLoadedSeconds = fmin(loadedSecond, itemDurationSeconds)
-        
-        if self.itemLoadedSeconds != itemLoadedSeconds {
-            self.itemLoadedSeconds = itemLoadedSeconds
-            dispatch_async(dispatch_get_main_queue(), {
-                self.delegate?.loadedSecondsDidChange(self.itemLoadedSeconds)
-            })
-        }
+        // loadedSeconds may a little bit bigger than itemDurationSeconds
+        itemLoadedSeconds = fmin(loadedSeconds, itemDurationSeconds)
     }
-    
-
 }
 
 
