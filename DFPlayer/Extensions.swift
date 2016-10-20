@@ -25,3 +25,11 @@ extension UISlider {
     }
 }
 
+extension UIView {
+    func df_addSubviews(subviews: [UIView]) {
+        for view in subviews {
+            self.addSubview(view)
+        }
+    }
+}
+

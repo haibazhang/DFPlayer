@@ -29,12 +29,11 @@ protocol DFPlayerControlEyeable: class {
     func didPlayingSliderTouchMovie(sender: UISlider)
     func didPlayingSliderTouchEnd(sender: UISlider)
     
-    
     /* for layout & style */
     func setupControlPanel()
 }
 
-// DFPlayerStateEyeable: Default Implementaion
+
 private class DFAssociation: NSObject {
     static let sharedInstance = DFAssociation()
     private override init() {}
@@ -210,7 +209,9 @@ private class DFTimeSlider: UISlider {
 
     // increase click area("hot spot")
     private override func pointInside(point: CGPoint, withEvent event: UIEvent?) -> Bool {
-        return CGRectContainsPoint(CGRectInset(bounds, -10, -15), point)
+        let widthDelta = fmax(44 - bounds.width, 0)
+        let heightDelta = fmax(44 - bounds.height, 0)
+        return CGRectContainsPoint(CGRectInset(bounds, -0.5 * widthDelta, -0.5 * heightDelta), point)
     }
     
     override init(frame: CGRect) {
@@ -225,13 +226,6 @@ private class DFTimeSlider: UISlider {
     }
 }
 
-private extension UIView {
-    func df_addSubviews(subviews: [UIView]) {
-        for view in subviews {
-            self.addSubview(view)
-        }
-    }
-}
 
 
 
