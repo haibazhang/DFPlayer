@@ -89,7 +89,7 @@ extension PlayerViewController: DFPlayerDelagate {
         
         currentSecondLabel.text = Int(second).toHourFormat()
         
-        if !playingSlider.df_touchMovie && !player.isSeeking {
+        if !playingSlider.df_touchMovie && !player.seeking {
             playingSlider.value = Float(second/player.itemDurationSeconds)
         }
     }

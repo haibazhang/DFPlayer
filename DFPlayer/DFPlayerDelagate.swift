@@ -16,6 +16,7 @@ protocol DFPlayerDelagate: class {
     func currentSecondDidChange(seconds: NSTimeInterval)
     func startLoading()
     func stopLoading()
+    func didFinished()
 }
 
 // DFPlayerDelagate: Default Implementaion
@@ -26,6 +27,7 @@ extension DFPlayerDelagate {
     func currentSecondDidChange(second: NSTimeInterval) {}
     func startLoading() {}
     func stopLoading() {}
+    func didFinished() {}
 }
 
 

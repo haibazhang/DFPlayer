@@ -12,8 +12,8 @@ import AVFoundation
 enum DFPlayerState: String {
     case Stopped = "Stopped"
     case Starting = "Starting"
-    case ReadyToPlay = "ReadyToPlay"
     case Failed = "Failed"
+    case ReadyToPlay = "ReadyToPlay"
     case Playing = "Playing"
     case Paused = "Paused"
 }
@@ -31,7 +31,6 @@ class DFPlayer: NSObject {
     // configure
     
     internal var autoStart: Bool = true
-
 
     private let minimumBufferRemainToPlay: Double = 1
 
@@ -90,7 +89,7 @@ class DFPlayer: NSObject {
     }
     
     private var _isLoading = false
-    private (set)var isLoading: Bool {
+    private(set) var isLoading: Bool {
         set {
             guard _isLoading != newValue else { return }
             _isLoading = newValue
@@ -108,17 +107,30 @@ class DFPlayer: NSObject {
         }
     }
     
-    private(set) var isSeeking = false
-    private(set) var isEnd: Bool = false
-
+    private var _isFinished: Bool = false
+    private(set) var isFinished: Bool {
+        set {
+            guard _isFinished != newValue else { return }
+            _isFinished = newValue
+            print("DFPlayer: isFinished = \(newValue)")
+            dispatch_async(dispatch_get_main_queue()) { 
+                if self._isFinished {
+                    self.delegate?.didFinished()
+                }
+            }
+        }
+        get {
+            return _isFinished
+        }
+    }
+    
+    private(set) var seeking = false
     private(set) var itemDurationSeconds: NSTimeInterval = 0
     private(set) var itemLoadedSeconds: NSTimeInterval = 0
     private(set) var itemCurrentSecond: NSTimeInterval = 0
     
     private weak var delegate: DFPlayerDelagate?
-    
     private var timer: NSTimer?
-
 
     override init() {
         fatalError("use init(:AVPlayerItem)")
@@ -147,6 +159,13 @@ class DFPlayer: NSObject {
         }
     }
     
+    internal func stop() {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.playerView.player?.replaceCurrentItemWithPlayerItem(nil)
+        }
+        state = .Stopped
+    }
+    
     internal func start() {
         dispatch_async(dispatch_get_main_queue()) {
             if self.playerView.player?.currentItem == nil {
@@ -154,13 +173,6 @@ class DFPlayer: NSObject {
             }
         }
         state = .Starting
-    }
-    
-    internal func stop() {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.playerView.player?.replaceCurrentItemWithPlayerItem(nil)
-        }
-        state = .Stopped
     }
     
     internal func play() {
@@ -177,16 +189,30 @@ class DFPlayer: NSObject {
         state = .Paused
     }
     
+    private func setFailed() {
+        state = .Failed
+    }
+    
+    private func setReadyToPlay() {
+        itemDurationSeconds = Double(playerItem.duration.value) / Double(playerItem.duration.timescale)
+        dispatch_async(dispatch_get_main_queue(), {
+            self.delegate?.durationSeconds(self.itemDurationSeconds)
+        })
+        state = .ReadyToPlay
+        addTimer()
+        play()
+    }
+    
     internal func seek(seekSecond: Double) {
         guard itemDurationSeconds > 0 && seekSecond < itemDurationSeconds else { return }
         print("DFPlayer: >>>>>>>>>seeking begin >>>>>>>>>")
         
-        isSeeking = true
+        seeking = true
         let time = CMTime(value: Int64(seekSecond), timescale: 1)
         dispatch_async(dispatch_get_main_queue()) {
             self.playerView.player?.seekToTime(time, completionHandler: { [weak self](_) in
                 guard let _self = self else { return }
-                _self.isSeeking = false
+                _self.seeking = false
                 print("DFPlayer: >>>>>>>>>seeking end >>>>>>>>>")
             })
         }
@@ -195,18 +221,16 @@ class DFPlayer: NSObject {
     private func addTimer() {
         timer = NSTimer.scheduledTimerWithTimeInterval(0.3, action: { [weak self](_) in
             guard let _self = self else { return }
-            
-            let isItemCurrentSecondUpdated = _self.updateItemCurrentSecond()
-            let isItemLoadedSecondsUpdated = _self.updateItemLoadedSeconds()
-
-            if isItemCurrentSecondUpdated || isItemLoadedSecondsUpdated {
-                _self.isWaitingBuffer =
-                    _self.detectIsWaitingBuffer(currentSecond: _self.itemCurrentSecond, loadedSeconds: _self.itemLoadedSeconds)
-            }
-            
-            _self.isEnd = _self.detectIsEnd(currentSecond: _self.itemCurrentSecond)
-
+                _self.query()
             }, repeats: true)
+    }
+    
+    private func query() {
+        updateItemCurrentSecond()
+        updateItemLoadedSeconds()
+        isWaitingBuffer =
+            detectIsWaitingBuffer(currentSecond: itemCurrentSecond, loadedSeconds: itemLoadedSeconds)
+        isFinished = detectIsFinished(currentSecond: itemCurrentSecond)
     }
     
     private func removeTimer() {
@@ -224,37 +248,24 @@ class DFPlayer: NSObject {
     
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         let playerItem = object as! AVPlayerItem
-        
         if keyPath == status {
             switch playerItem.status {
             case .Unknown:
                 break
-            case .ReadyToPlay:
-                state = .ReadyToPlay
-                itemDurationSeconds = Double(playerItem.duration.value) / Double(playerItem.duration.timescale)
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.delegate?.durationSeconds(self.itemDurationSeconds)
-                })
-                
-                addTimer()
-                play()
-                
-                break
             case .Failed:
-                state = .Failed
+                setFailed()
+                break
+            case .ReadyToPlay:
+                setReadyToPlay()
                 break
             }
         }
     }
     
-    // itemDurationSeconds > 0 | {currentSecond} => isEnd
-    private func detectIsEnd(currentSecond currentSecond: Double) -> Bool {
+    // itemDurationSeconds > 0 | {currentSecond} => isFinished
+    private func detectIsFinished(currentSecond currentSecond: Double) -> Bool {
         guard itemDurationSeconds > 0 else { return false }
-        let isEnd = fabs(itemDurationSeconds-currentSecond) < 1
-        if isEnd {
-            state = .Stopped
-        }
-        return isEnd
+        return fabs(itemDurationSeconds-currentSecond) < 1
     }
     
     // {state, isWaitingBuffer} => isLoading
@@ -269,13 +280,13 @@ class DFPlayer: NSObject {
     private func detectIsWaitingBuffer(currentSecond currentSecond: Double, loadedSeconds: Double) -> Bool {
         
         // fix bug
-        if isSeeking {
+        if seeking {
             return true
         } else {
             // should not return false
         }
         
-        guard state == .Playing && itemLoadedSeconds > 0 else { return true }
+        guard itemLoadedSeconds > 0 else { return true }
         
         let bufferRemain = itemLoadedSeconds - itemCurrentSecond
         
@@ -283,24 +294,19 @@ class DFPlayer: NSObject {
         return bufferRemain <= self.minimumBufferRemainToPlay ? true : false
     }
     
-    private func updateItemCurrentSecond() -> Bool {
-        var isChanging = false
+    private func updateItemCurrentSecond() {
         let itemCurrentSecond = Double(playerItem.currentTime().value) / Double(playerItem.currentTime().timescale)
         if self.itemCurrentSecond != itemCurrentSecond {
-            isChanging = true
             self.itemCurrentSecond = itemCurrentSecond
             dispatch_async(dispatch_get_main_queue(), {
                 self.delegate?.currentSecondDidChange(self.itemCurrentSecond)
             })
         }
-        return isChanging
     }
     
-    private func updateItemLoadedSeconds() -> Bool {
-        var isChanging = false
-        
+    private func updateItemLoadedSeconds() {
         let loadedTimeRanges = playerView.player?.currentItem?.loadedTimeRanges
-        guard let timeRange = loadedTimeRanges?.first?.CMTimeRangeValue else { return isChanging }
+        guard let timeRange = loadedTimeRanges?.first?.CMTimeRangeValue else { return }
         
         let startSeconds = Double(CMTimeGetSeconds(timeRange.start))
         let durationSeconds = Double(CMTimeGetSeconds(timeRange.duration))
@@ -310,13 +316,11 @@ class DFPlayer: NSObject {
         let itemLoadedSeconds = fmin(loadedSecond, itemDurationSeconds)
         
         if self.itemLoadedSeconds != itemLoadedSeconds {
-            isChanging = true
             self.itemLoadedSeconds = itemLoadedSeconds
             dispatch_async(dispatch_get_main_queue(), {
                 self.delegate?.loadedSecondsDidChange(self.itemLoadedSeconds)
             })
         }
-        return isChanging
     }
     
 
