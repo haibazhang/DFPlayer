@@ -13,7 +13,6 @@ enum DFPlayerState: String {
     case Stopped = "Stopped"
     case Starting = "Starting"
     case Failed = "Failed"
-    case ReadyToPlay = "ReadyToPlay"
     case Playing = "Playing"
     case Paused = "Paused"
 }
@@ -193,12 +192,11 @@ class DFPlayer: NSObject {
         state = .Failed
     }
     
-    private func setReadyToPlay() {
+    private func readyPlay() {
         itemDurationSeconds = Double(playerItem.duration.value) / Double(playerItem.duration.timescale)
         dispatch_async(dispatch_get_main_queue(), {
             self.delegate?.durationSeconds(self.itemDurationSeconds)
         })
-        state = .ReadyToPlay
         addTimer()
         play()
     }
@@ -256,7 +254,7 @@ class DFPlayer: NSObject {
                 setFailed()
                 break
             case .ReadyToPlay:
-                setReadyToPlay()
+                readyPlay()
                 break
             }
         }
