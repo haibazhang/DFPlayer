@@ -14,7 +14,6 @@ let testURLString1 = "http://www.html5videoplayer.net/videos/toystory.mp4"
 let testURLString2 = "http://clips.vorwaerts-gmbh.de/VfE_html5.mp4"
 
 class PlayerViewController: UIViewController {
-
     deinit {
         print("deinit: - \(self)")
     }
@@ -27,20 +26,18 @@ class PlayerViewController: UIViewController {
         return DFPlayer(playerItem: self.playerItem, delegate: self)
     }()
     
+    var controlPanel: DFPlayerControlPanelProtocol?
+    
+    var isSilderTouching = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.whiteColor()
         
-        
         setupPlayerView()
-        
-        setupLoadingView()
-        
         setupControlPanel()
-        
     }
-    
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -52,8 +49,6 @@ class PlayerViewController: UIViewController {
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
-    
-    
     func setupPlayerView() {
         let supView = view
         supView.addSubview(player.playerView)
@@ -64,41 +59,61 @@ class PlayerViewController: UIViewController {
         }
         player.playerView.backgroundColor = UIColor.blackColor()
     }
-}
-
-extension PlayerViewController: DFPlayerLoadingEyeable {
-    var lv_container: UIView {
-        get {
-            return self.player.playerView
+    
+    func setupControlPanel() {
+        let cp = PlayerControlPanel()
+        player.playerView.addSubview(cp.container)
+        cp.container.snp_makeConstraints { (make) in
+            make.edges.equalTo(player.playerView)
         }
-    }
-}
+        
+        cp.playingSlider.addAction({ [weak self](sender) in
+            guard let _self = self else { return }
+            _self.isSilderTouching = true
+        }, forControlEvents: .TouchDown)
 
-extension PlayerViewController: DFPlayerControlEyeable {
-    var cp_container: UIView {
-        get {
-            return self.player.playerView
-        }
+        cp.playingSlider.addAction({ [weak self](sender) in
+            guard let _self = self else { return }
+            guard let slider = sender as? UISlider else { return }
+            let endTime = Double(slider.value) * _self.player.itemDurationSeconds
+            _self.player.seek(endTime)
+            _self.isSilderTouching = false
+            }, forControlEvents: .TouchUpInside)
+        
+        cp.backButton.addAction({ [weak self](_) in
+            guard let _self = self else { return }
+            _self.navigationController?.popViewControllerAnimated(true)
+            }, forControlEvents: .TouchUpInside)
+        
+        cp.playButton.addAction({ [weak player](_) in
+            guard let _player = player else { return }
+            if _player.state == .Starting {
+                _player.stop()
+            } else if _player.state == .Stopped || _player.state == .Failed {
+                _player.start()
+            } else if _player.state == .Playing {
+                _player.pause()
+            } else {
+                _player.play()
+            }
+            }, forControlEvents: .TouchUpInside)
+        self.controlPanel = cp
     }
 }
 
 extension PlayerViewController: DFPlayerDelagate {
     func durationSeconds(seconds: NSTimeInterval) {
         print("duration: - \(seconds) seconds")
-        
-        durationSecondsLabel.text = Int(seconds).toHourFormat()
+        controlPanel?.durationSecondsLabel.text = Int(seconds).df_toHourFormat()
     }
     
     func currentSecondDidChange(second: NSTimeInterval) {
         print("current: - \(second) second")
-        
-        currentSecondLabel.text = Int(second).toHourFormat()
-        
-        if !playingSlider.df_touchMovie && !player.seeking {
-            playingSlider.value = Float(second/player.itemDurationSeconds)
+        controlPanel?.currentSecondLabel.text = Int(second).df_toHourFormat()
+        if !isSilderTouching && !player.seeking {
+            controlPanel?.playingSlider.value = Float(second/player.itemDurationSeconds)
         }
     }
-    
     
     func loadedSecondsDidChange(seconds: NSTimeInterval) {
         print("loaded: - \(seconds) seconds")
@@ -110,64 +125,20 @@ extension PlayerViewController: DFPlayerDelagate {
         let duration = player.itemDurationSeconds
         guard seconds >= 0 && duration > 0 else { return }
         let progress = Float(seconds)/Float(duration)
-        loadedProgress.setProgress(progress, animated: true)
-    }
-    
-    
-    func didTapBackButton() {
-        self.navigationController?.popViewControllerAnimated(true)
-    }
-    
-    func titleForVideo() -> String {
-        return "video title"
-    }
-    
-    func startLoading() {
-        loadingView.hidden = false
-        loadingView.startAnimation()
-    }
-    
-    func stopLoading() {
-        loadingView.hidden = true
-        loadingView.stopAnimation()
+        controlPanel?.loadedProgress.setProgress(progress, animated: true)
     }
     
     func playerStateDidChange(state: DFPlayerState) {
-        playButton.selected = (state == .Playing || state == .Starting)
+        controlPanel?.playButton.selected = (state == .Playing || state == .Starting)
     }
     
-    func didTapPlayButton() {
-        if player.state == .Starting {
-            player.stop()
-        } else if player.state == .Stopped || player.state == .Failed {
-            player.start()
-        } else if player.state == .Playing {
-            player.pause()
-        } else {
-            player.play()
-        }
+    func startLoading() {
+        controlPanel?.loadingView.hidden = false
+        controlPanel?.loadingView.startAnimation()
     }
     
-    func didPlayingSliderTouchEnd(sender: UISlider) {
-        let endTime = Double(sender.value) * player.itemDurationSeconds
-        player.seek(endTime)
-    }
-    
-    
-    
-}
-
-private extension Int {
-    func toHourFormat() -> String {
-        let hour = self/3600
-        let minute = self%3600/60
-        let second = self%3600%60
-        
-        if (hour > 0) {
-            return String(format: "%02d:%02d:%02d", hour, minute, second)
-        } else {
-            return String(format: "%02d:%02d", minute, second)
-        }
+    func stopLoading() {
+        controlPanel?.loadingView.hidden = true
+        controlPanel?.loadingView.stopAnimation()
     }
 }
-

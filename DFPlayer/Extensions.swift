@@ -8,23 +8,6 @@
 
 import UIKit
 
-extension UISlider {
-    private class UISliderAssociation: NSObject {
-        static let sharedInstance = UISliderAssociation()
-        private override init() {}
-        var touchMovie: Bool = false
-    }
-    
-    var df_touchMovie: Bool {
-        get {
-            return UISliderAssociation.sharedInstance.touchMovie
-        }
-        set {
-            UISliderAssociation.sharedInstance.touchMovie = newValue
-        }
-    }
-}
-
 extension UIView {
     func df_addSubviews(subviews: [UIView]) {
         for view in subviews {
@@ -32,4 +15,19 @@ extension UIView {
         }
     }
 }
+
+extension Int {
+    func df_toHourFormat() -> String {
+        let hour = self/3600
+        let minute = self%3600/60
+        let second = self%3600%60
+        
+        if (hour > 0) {
+            return String(format: "%02d:%02d:%02d", hour, minute, second)
+        } else {
+            return String(format: "%02d:%02d", minute, second)
+        }
+    }
+}
+
 
