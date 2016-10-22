@@ -37,6 +37,11 @@ class MainViewController: UIViewController {
             make.center.equalTo(view)
             make.width.height.equalTo(80)
         }
+        if demoButton.window != nil {
+            demoButton.becomeFirstResponder()
+        }
     }
     
 }
+
+

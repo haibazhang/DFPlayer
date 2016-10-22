@@ -19,6 +19,7 @@
 		50A169CE1DB4D25D002DE4FC /* DFPlayerDelagate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */; };
 		50A169D01DB4D275002DE4FC /* DFPlayerLoadingEyeable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CF1DB4D275002DE4FC /* DFPlayerLoadingEyeable.swift */; };
 		50A169D81DB93ED8002DE4FC /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169D71DB93ED8002DE4FC /* Extensions.swift */; };
+		50A169DC1DBB8ADA002DE4FC /* PlayerControlPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169DB1DBB8ADA002DE4FC /* PlayerControlPanel.swift */; };
 		C24C065766790170F4841475 /* Pods_DFPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B0C476F82EE2A39CBD8559E /* Pods_DFPlayer.framework */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +39,7 @@
 		50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerDelagate.swift; sourceTree = "<group>"; };
 		50A169CF1DB4D275002DE4FC /* DFPlayerLoadingEyeable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerLoadingEyeable.swift; sourceTree = "<group>"; };
 		50A169D71DB93ED8002DE4FC /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		50A169DB1DBB8ADA002DE4FC /* PlayerControlPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerControlPanel.swift; sourceTree = "<group>"; };
 		A565C5EF011833CFAB084237 /* Pods-DFPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DFPlayer.release.xcconfig"; path = "Pods/Target Support Files/Pods-DFPlayer/Pods-DFPlayer.release.xcconfig"; sourceTree = "<group>"; };
 		EEA62E23AE157AEA0F7FED8D /* Pods-DFPlayer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DFPlayer.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DFPlayer/Pods-DFPlayer.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -87,8 +89,9 @@
 				50A169AA1DAFBCDC002DE4FC /* AppDelegate.swift */,
 				50A169C31DB06ADD002DE4FC /* MainViewController.swift */,
 				50A169AC1DAFBCDC002DE4FC /* PlayerViewController.swift */,
-				50A169C11DAFCA7B002DE4FC /* Constants.swift */,
+				50A169DB1DBB8ADA002DE4FC /* PlayerControlPanel.swift */,
 				50A169D71DB93ED8002DE4FC /* Extensions.swift */,
+				50A169C11DAFCA7B002DE4FC /* Constants.swift */,
 				50A169B11DAFBCDC002DE4FC /* Assets.xcassets */,
 				50A169B31DAFBCDC002DE4FC /* LaunchScreen.storyboard */,
 				50A169B61DAFBCDC002DE4FC /* Info.plist */,
@@ -102,8 +105,8 @@
 				50A169BF1DAFC4CF002DE4FC /* DFPlayerView.swift */,
 				50A169C91DB0725F002DE4FC /* DFPlayer.swift */,
 				50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */,
-				50A169CF1DB4D275002DE4FC /* DFPlayerLoadingEyeable.swift */,
 				50A169CB1DB14639002DE4FC /* DFPlayerControlEyeable.swift */,
+				50A169CF1DB4D275002DE4FC /* DFPlayerLoadingEyeable.swift */,
 			);
 			name = Player;
 			sourceTree = "<group>";
@@ -238,6 +241,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50A169DC1DBB8ADA002DE4FC /* PlayerControlPanel.swift in Sources */,
 				50A169C41DB06ADD002DE4FC /* MainViewController.swift in Sources */,
 				50A169D01DB4D275002DE4FC /* DFPlayerLoadingEyeable.swift in Sources */,
 				50A169C01DAFC4CF002DE4FC /* DFPlayerView.swift in Sources */,

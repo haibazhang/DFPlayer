@@ -32,12 +32,15 @@ class PlayerViewController: UIViewController {
         
         view.backgroundColor = UIColor.whiteColor()
         
+        
         setupPlayerView()
         
         setupLoadingView()
         
         setupControlPanel()
+        
     }
+    
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -48,6 +51,8 @@ class PlayerViewController: UIViewController {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
+    
+    
     
     func setupPlayerView() {
         let supView = view
@@ -147,6 +152,8 @@ extension PlayerViewController: DFPlayerDelagate {
         let endTime = Double(sender.value) * player.itemDurationSeconds
         player.seek(endTime)
     }
+    
+    
     
 }
 
