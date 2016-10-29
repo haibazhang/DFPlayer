@@ -9,6 +9,8 @@
 import UIKit
 import AVFoundation
 import SnapKit
+import ReactiveUI
+import NVActivityIndicatorView
 
 let testURLString1 = "http://www.html5videoplayer.net/videos/toystory.mp4"
 let testURLString2 = "http://clips.vorwaerts-gmbh.de/VfE_html5.mp4"
@@ -23,10 +25,27 @@ class PlayerViewController: UIViewController {
     }()
     
     lazy var player: DFPlayer = {
-        return DFPlayer(playerItem: self.playerItem, delegate: self)
+        let loadingView = NVActivityIndicatorView(frame: CGRectZero, type: .BallRotateChase, color: UIColor.whiteColor(), padding: 0)
+        let player = DFPlayer(playerItem: self.playerItem, delegate: self, loadingView: loadingView)
+        player.controlable = self.ctrlPanel
+//        player.maskable = self.masker
+
+        return player
     }()
     
-    var controlPanel: DFPlayerControlPanelProtocol?
+    lazy var ctrlPanel: PlayerControlPanel = {
+        let panel = PlayerControlPanel()
+        panel.delegate = self
+        return panel
+    }()
+    
+    lazy var masker: DFPlayerMaskable = {
+        let masker = PlayerMasker()
+        masker.delegate = self
+        return masker
+    }()
+    
+    let backButton = UIButton()
     
     var isSilderTouching = false
     
@@ -36,109 +55,72 @@ class PlayerViewController: UIViewController {
         view.backgroundColor = UIColor.whiteColor()
         
         setupPlayerView()
-        setupControlPanel()
+        setupBackButton()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: true)
+        GlobalSettings.shouldAutorotate = true
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
+        GlobalSettings.shouldAutorotate = false
     }
     
     func setupPlayerView() {
         let supView = view
         supView.addSubview(player.playerView)
         player.playerView.snp_makeConstraints { (make) in
-            make.top.left.equalTo(supView)
-            make.width.equalTo(screenWidth)
-            make.height.equalTo(screenWidth*(screenWidthHeightRate))
+            make.top.left.right.equalTo(supView)
+            make.height.equalTo(supView.snp_width).multipliedBy(screenWidth/screenHeight)
         }
-        player.playerView.backgroundColor = UIColor.blackColor()
     }
     
-    func setupControlPanel() {
-        let cp = PlayerControlPanel()
-        player.playerView.addSubview(cp.container)
-        cp.container.snp_makeConstraints { (make) in
-            make.edges.equalTo(player.playerView)
+    func setupBackButton() {
+        let supView = player.playerView
+        supView.addSubview(backButton)
+        backButton.snp_makeConstraints { (make) in
+            make.centerY.equalTo(supView.snp_top).offset(64/2)
+            make.centerX.equalTo(supView.snp_left).offset(16+6)
+            make.width.height.equalTo(64)
         }
+        backButton.setImage(UIImage(named: "back"), forState: .Normal)
         
-        cp.playingSlider.addAction({ [weak self](sender) in
+        backButton.addAction({ [weak self](_) in
             guard let _self = self else { return }
-            _self.isSilderTouching = true
-        }, forControlEvents: .TouchDown)
-
-        cp.playingSlider.addAction({ [weak self](sender) in
-            guard let _self = self else { return }
-            guard let slider = sender as? UISlider else { return }
-            let endTime = Double(slider.value) * _self.player.itemDurationSeconds
-            _self.player.seek(endTime)
-            _self.isSilderTouching = false
-            }, forControlEvents: .TouchUpInside)
-        
-        cp.backButton.addAction({ [weak self](_) in
-            guard let _self = self else { return }
-            _self.navigationController?.popViewControllerAnimated(true)
-            }, forControlEvents: .TouchUpInside)
-        
-        cp.playButton.addAction({ [weak player](_) in
-            guard let _player = player else { return }
-            if _player.state == .Starting {
-                _player.stop()
-            } else if _player.state == .Stopped || _player.state == .Failed {
-                _player.start()
-            } else if _player.state == .Playing {
-                _player.pause()
+            if UIDevice.df_isLandscape() {
+                UIDevice.df_toPortrait()
             } else {
-                _player.play()
+                _self.navigationController?.popViewControllerAnimated(true)
             }
             }, forControlEvents: .TouchUpInside)
-        self.controlPanel = cp
     }
 }
 
-extension PlayerViewController: DFPlayerDelagate {
-    func durationSeconds(seconds: NSTimeInterval) {
-        print("duration: - \(seconds) seconds")
-        controlPanel?.durationSecondsLabel.text = Int(seconds).df_toHourFormat()
-    }
-    
-    func currentSecondDidChange(second: NSTimeInterval) {
-        print("current: - \(second) second")
-        controlPanel?.currentSecondLabel.text = Int(second).df_toHourFormat()
-        if !isSilderTouching && !player.seeking {
-            controlPanel?.playingSlider.value = Float(second/player.itemDurationSeconds)
+extension PlayerViewController: DFPlayerDelagate {}
+
+extension PlayerViewController: PlayerControlPanelDelegate {
+    func didPlayButtonTap() {
+        if player.state == .Starting {
+            player.stop()
+        } else if player.state == .Stopped || player.state == .Failed {
+            player.start()
+        } else if player.state == .Playing {
+            player.pause()
+        } else {
+            player.play()
         }
     }
     
-    func loadedSecondsDidChange(seconds: NSTimeInterval) {
-        print("loaded: - \(seconds) seconds")
-        
-        if seconds > player.itemDurationSeconds {
-            fatalError("loaded > duration!!!")
-        }
-        
-        let duration = player.itemDurationSeconds
-        guard seconds >= 0 && duration > 0 else { return }
-        let progress = Float(seconds)/Float(duration)
-        controlPanel?.loadedProgress.setProgress(progress, animated: true)
+    func didSliderTouchEnd(sender: UISlider) {
+        let endTime = Double(sender.value) * player.itemDurationSeconds
+        player.seek(endTime)
     }
+}
+
+extension PlayerViewController: PlayerMasterDelegate {
     
-    func playerStateDidChange(state: DFPlayerState) {
-        controlPanel?.playButton.selected = (state == .Playing || state == .Starting)
-    }
-    
-    func startLoading() {
-        controlPanel?.loadingView.hidden = false
-        controlPanel?.loadingView.startAnimation()
-    }
-    
-    func stopLoading() {
-        controlPanel?.loadingView.hidden = true
-        controlPanel?.loadingView.stopAnimation()
-    }
 }

@@ -19,11 +19,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let wdn = window {
             wdn.backgroundColor = UIColor.whiteColor()
             wdn.makeKeyAndVisible()
-            wdn.rootViewController = UINavigationController(rootViewController: MainViewController())
+            wdn.rootViewController = DFNavigationController(rootViewController: MainViewController())
         }
-        
         return true
     }
+}
 
+class GlobalSettings {
+    static var shouldAutorotate: Bool = false
+}
+
+class DFNavigationController: UINavigationController {
+    override func shouldAutorotate() -> Bool {
+        return GlobalSettings.shouldAutorotate
+    }
 }
 

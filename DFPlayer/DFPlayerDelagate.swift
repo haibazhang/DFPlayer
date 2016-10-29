@@ -19,7 +19,6 @@ protocol DFPlayerDelagate: class {
     func didFinished()
 }
 
-// DFPlayerDelagate: Default Implementaion
 extension DFPlayerDelagate {
     func playerStateDidChange(state: DFPlayerState) {}
     func durationSeconds(seconds: NSTimeInterval) {}

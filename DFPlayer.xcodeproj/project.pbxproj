@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5097AEB91DBFB87E009AD63D /* PlayerMasterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5097AEB81DBFB87E009AD63D /* PlayerMasterDelegate.swift */; };
 		50A169AB1DAFBCDC002DE4FC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169AA1DAFBCDC002DE4FC /* AppDelegate.swift */; };
 		50A169AD1DAFBCDC002DE4FC /* PlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169AC1DAFBCDC002DE4FC /* PlayerViewController.swift */; };
 		50A169B21DAFBCDC002DE4FC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50A169B11DAFBCDC002DE4FC /* Assets.xcassets */; };
@@ -15,15 +16,19 @@
 		50A169C21DAFCA7B002DE4FC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169C11DAFCA7B002DE4FC /* Constants.swift */; };
 		50A169C41DB06ADD002DE4FC /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169C31DB06ADD002DE4FC /* MainViewController.swift */; };
 		50A169CA1DB0725F002DE4FC /* DFPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169C91DB0725F002DE4FC /* DFPlayer.swift */; };
-		50A169CC1DB14639002DE4FC /* DFPlayerControlPanelProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CB1DB14639002DE4FC /* DFPlayerControlPanelProtocol.swift */; };
+		50A169CC1DB14639002DE4FC /* DFPlayerControlable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CB1DB14639002DE4FC /* DFPlayerControlable.swift */; };
 		50A169CE1DB4D25D002DE4FC /* DFPlayerDelagate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */; };
-		50A169D81DB93ED8002DE4FC /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169D71DB93ED8002DE4FC /* Extensions.swift */; };
+		50A169D81DB93ED8002DE4FC /* DFExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169D71DB93ED8002DE4FC /* DFExtensions.swift */; };
 		50A169DC1DBB8ADA002DE4FC /* PlayerControlPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169DB1DBB8ADA002DE4FC /* PlayerControlPanel.swift */; };
+		50A169E01DBBAFDF002DE4FC /* PlayerControlPanelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169DF1DBBAFDF002DE4FC /* PlayerControlPanelDelegate.swift */; };
+		50A169E21DBF1492002DE4FC /* DFPlayerMaskable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169E11DBF1492002DE4FC /* DFPlayerMaskable.swift */; };
+		50A169E41DBF14C0002DE4FC /* PlayerMasker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169E31DBF14C0002DE4FC /* PlayerMasker.swift */; };
 		C24C065766790170F4841475 /* Pods_DFPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B0C476F82EE2A39CBD8559E /* Pods_DFPlayer.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2B0C476F82EE2A39CBD8559E /* Pods_DFPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DFPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5097AEB81DBFB87E009AD63D /* PlayerMasterDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerMasterDelegate.swift; sourceTree = "<group>"; };
 		50A169A71DAFBCDC002DE4FC /* DFPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DFPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A169AA1DAFBCDC002DE4FC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		50A169AC1DAFBCDC002DE4FC /* PlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewController.swift; sourceTree = "<group>"; };
@@ -34,10 +39,13 @@
 		50A169C11DAFCA7B002DE4FC /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		50A169C31DB06ADD002DE4FC /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		50A169C91DB0725F002DE4FC /* DFPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayer.swift; sourceTree = "<group>"; };
-		50A169CB1DB14639002DE4FC /* DFPlayerControlPanelProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerControlPanelProtocol.swift; sourceTree = "<group>"; };
+		50A169CB1DB14639002DE4FC /* DFPlayerControlable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerControlable.swift; sourceTree = "<group>"; };
 		50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerDelagate.swift; sourceTree = "<group>"; };
-		50A169D71DB93ED8002DE4FC /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		50A169D71DB93ED8002DE4FC /* DFExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFExtensions.swift; sourceTree = "<group>"; };
 		50A169DB1DBB8ADA002DE4FC /* PlayerControlPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerControlPanel.swift; sourceTree = "<group>"; };
+		50A169DF1DBBAFDF002DE4FC /* PlayerControlPanelDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerControlPanelDelegate.swift; sourceTree = "<group>"; };
+		50A169E11DBF1492002DE4FC /* DFPlayerMaskable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerMaskable.swift; sourceTree = "<group>"; };
+		50A169E31DBF14C0002DE4FC /* PlayerMasker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerMasker.swift; sourceTree = "<group>"; };
 		A565C5EF011833CFAB084237 /* Pods-DFPlayer.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DFPlayer.release.xcconfig"; path = "Pods/Target Support Files/Pods-DFPlayer/Pods-DFPlayer.release.xcconfig"; sourceTree = "<group>"; };
 		EEA62E23AE157AEA0F7FED8D /* Pods-DFPlayer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DFPlayer.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DFPlayer/Pods-DFPlayer.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -88,7 +96,9 @@
 				50A169C31DB06ADD002DE4FC /* MainViewController.swift */,
 				50A169AC1DAFBCDC002DE4FC /* PlayerViewController.swift */,
 				50A169DB1DBB8ADA002DE4FC /* PlayerControlPanel.swift */,
-				50A169D71DB93ED8002DE4FC /* Extensions.swift */,
+				50A169DF1DBBAFDF002DE4FC /* PlayerControlPanelDelegate.swift */,
+				50A169E31DBF14C0002DE4FC /* PlayerMasker.swift */,
+				5097AEB81DBFB87E009AD63D /* PlayerMasterDelegate.swift */,
 				50A169C11DAFCA7B002DE4FC /* Constants.swift */,
 				50A169B11DAFBCDC002DE4FC /* Assets.xcassets */,
 				50A169B31DAFBCDC002DE4FC /* LaunchScreen.storyboard */,
@@ -103,7 +113,9 @@
 				50A169BF1DAFC4CF002DE4FC /* DFPlayerView.swift */,
 				50A169C91DB0725F002DE4FC /* DFPlayer.swift */,
 				50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */,
-				50A169CB1DB14639002DE4FC /* DFPlayerControlPanelProtocol.swift */,
+				50A169CB1DB14639002DE4FC /* DFPlayerControlable.swift */,
+				50A169E11DBF1492002DE4FC /* DFPlayerMaskable.swift */,
+				50A169D71DB93ED8002DE4FC /* DFExtensions.swift */,
 			);
 			name = Player;
 			sourceTree = "<group>";
@@ -239,11 +251,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				50A169DC1DBB8ADA002DE4FC /* PlayerControlPanel.swift in Sources */,
+				50A169E41DBF14C0002DE4FC /* PlayerMasker.swift in Sources */,
+				50A169E01DBBAFDF002DE4FC /* PlayerControlPanelDelegate.swift in Sources */,
 				50A169C41DB06ADD002DE4FC /* MainViewController.swift in Sources */,
 				50A169C01DAFC4CF002DE4FC /* DFPlayerView.swift in Sources */,
+				50A169E21DBF1492002DE4FC /* DFPlayerMaskable.swift in Sources */,
 				50A169AD1DAFBCDC002DE4FC /* PlayerViewController.swift in Sources */,
-				50A169CC1DB14639002DE4FC /* DFPlayerControlPanelProtocol.swift in Sources */,
-				50A169D81DB93ED8002DE4FC /* Extensions.swift in Sources */,
+				5097AEB91DBFB87E009AD63D /* PlayerMasterDelegate.swift in Sources */,
+				50A169CC1DB14639002DE4FC /* DFPlayerControlable.swift in Sources */,
+				50A169D81DB93ED8002DE4FC /* DFExtensions.swift in Sources */,
 				50A169AB1DAFBCDC002DE4FC /* AppDelegate.swift in Sources */,
 				50A169C21DAFCA7B002DE4FC /* Constants.swift in Sources */,
 				50A169CA1DB0725F002DE4FC /* DFPlayer.swift in Sources */,
