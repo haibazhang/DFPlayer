@@ -15,7 +15,7 @@ extension UIView {
         }
     }
     
-    func df_addMaskView(subview: UIView) {
+    func df_addSubViewEquirotal(subview: UIView) {
         self.addSubview(subview)
         subview.snp_makeConstraints { (make) in
             make.edges.equalTo(self)

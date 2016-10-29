@@ -15,11 +15,9 @@ class DFPlayerView: UIView {
         print("deinit: - \(self)")
     }
     
-    private(set) var loadingView: NVActivityIndicatorView?
-    
     let playerLayerView = DFPlayerLayerView()
     
-    private(set) var player: AVPlayer? {
+    var player: AVPlayer? {
         get {
             return (playerLayerView.layer as! AVPlayerLayer).player
         }
@@ -28,27 +26,22 @@ class DFPlayerView: UIView {
         }
     }
     
-//    override class func layerClass() -> AnyClass {
-//        return AVPlayerLayer.self
-//    }
-
-    
-    internal init(player: AVPlayer, loadingView: NVActivityIndicatorView?) {
-        super.init(frame: CGRectZero)
-        
-        self.df_addMaskView(playerLayerView)
-        
-        self.player = player
-        self.loadingView = loadingView
-        self.backgroundColor = UIColor.blackColor()
-        
-        if let ldView = loadingView {
-            self.addSubview(ldView)
-            ldView.snp_makeConstraints(closure: { (make) in
+    var loadingView: NVActivityIndicatorView? = nil {
+        didSet {
+            oldValue?.removeFromSuperview()
+            guard let loadingView = self.loadingView else { return }
+            self.addSubview(loadingView)
+            loadingView.snp_makeConstraints(closure: { (make) in
                 make.center.equalTo(self)
                 make.width.height.equalTo(36)
             })
         }
+    }
+    
+    internal init() {
+        super.init(frame: CGRectZero)
+        self.df_addSubViewEquirotal(playerLayerView)
+        self.backgroundColor = UIColor.blackColor()
     }
     
     required init?(coder aDecoder: NSCoder) {

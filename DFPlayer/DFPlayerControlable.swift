@@ -26,15 +26,6 @@ protocol DFPlayerControlable: class {
     /* for layout & style */
     func setup()
     func show()
-    func dismiss()
-    
-    // @optional
-    func titleForVideo() -> String
-}
-
-extension DFPlayerControlable {
-    func titleForVideo() -> String {
-        return ""
-    }
+    func dismiss()    
 }
 

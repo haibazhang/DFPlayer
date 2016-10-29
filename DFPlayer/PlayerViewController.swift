@@ -12,24 +12,28 @@ import SnapKit
 import ReactiveUI
 import NVActivityIndicatorView
 
-let testURLString1 = "http://www.html5videoplayer.net/videos/toystory.mp4"
-let testURLString2 = "http://clips.vorwaerts-gmbh.de/VfE_html5.mp4"
+let movies: [(String, String)] = [
+    ("http://www.html5videoplayer.net/videos/toystory.mp4", "Toy Story"),
+    ("http://clips.vorwaerts-gmbh.de/VfE_html5.mp4", "Unknown Movie"),
+]
 
 class PlayerViewController: UIViewController {
     deinit {
         print("deinit: - \(self)")
     }
     
-    lazy var playerItem: AVPlayerItem = {
-        return AVPlayerItem(URL: NSURL(string: testURLString1)!)
-    }()
+    var movieIndex = -1 {
+        didSet {
+            self.player.playerItem = AVPlayerItem(URL: NSURL(string: movies[self.movieIndex].0)!)
+            self.ctrlPanel.titleLabel.text = movies[self.movieIndex].1
+        }
+    }
     
     lazy var player: DFPlayer = {
-        let loadingView = NVActivityIndicatorView(frame: CGRectZero, type: .BallRotateChase, color: UIColor.whiteColor(), padding: 0)
-        let player = DFPlayer(playerItem: self.playerItem, delegate: self, loadingView: loadingView)
+        let player = DFPlayer(delegate: self)
         player.controlable = self.ctrlPanel
-//        player.maskable = self.masker
-
+        player.maskable = self.masker
+        player.loadingView = NVActivityIndicatorView(frame: CGRectZero, type: .BallRotateChase, color: UIColor.whiteColor(), padding: 0)
         return player
     }()
     
@@ -46,7 +50,7 @@ class PlayerViewController: UIViewController {
     }()
     
     let backButton = UIButton()
-    
+    let nextMovie = UIButton()
     var isSilderTouching = false
     
     override func viewDidLoad() {
@@ -56,6 +60,9 @@ class PlayerViewController: UIViewController {
         
         setupPlayerView()
         setupBackButton()
+        setupNextMovieButton()
+        
+        movieIndex = 0
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -98,15 +105,43 @@ class PlayerViewController: UIViewController {
             }
             }, forControlEvents: .TouchUpInside)
     }
+    
+    func setupNextMovieButton() {
+        view.addSubview(nextMovie)
+        nextMovie.snp_makeConstraints { (make) in
+            make.center.equalTo(view)
+            make.width.height.equalTo(150)
+        }
+        nextMovie.setTitleColor(UIColor.blueColor(), forState: .Normal)
+        nextMovie.setTitle("next movie", forState: .Normal)
+        nextMovie.addAction({ [weak self](_) in
+            guard let _self = self else { return }
+            _self.movieIndex = (_self.movieIndex+1) % movies.count
+            }, forControlEvents: .TouchUpInside)
+    }
+    
+    override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
+        nextMovie.hidden = UIDevice.df_isLandscape()
+    }
 }
 
-extension PlayerViewController: DFPlayerDelagate {}
+extension PlayerViewController: DFPlayerDelagate {
+    func playerStateDidChange(state: DFPlayerState) {
+        self.ctrlPanel.container.hidden = (state == .Finished)
+    }
+}
+
+extension PlayerViewController: PlayerMasterDelegate {
+    func didReplayButtonTap() {
+        self.player.replay()
+    }
+}
 
 extension PlayerViewController: PlayerControlPanelDelegate {
     func didPlayButtonTap() {
         if player.state == .Starting {
             player.stop()
-        } else if player.state == .Stopped || player.state == .Failed {
+        } else if player.state == .Stopped || player.state == .Failed || player.state == .Timeout {
             player.start()
         } else if player.state == .Playing {
             player.pause()
@@ -121,6 +156,6 @@ extension PlayerViewController: PlayerControlPanelDelegate {
     }
 }
 
-extension PlayerViewController: PlayerMasterDelegate {
-    
-}
+
+
+

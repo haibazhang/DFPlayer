@@ -38,6 +38,16 @@ class PlayerControlPanel: NSObject {
     override init() {
         super.init()
         setup()
+        clear()
+    }
+    
+    func clear() {
+        playButton.selected = false
+        fullScreenButton.selected = false
+        currentSecondLabel.text = "00:00"
+        durationSecondsLabel.text = "00:00"
+        loadedProgress.progress = 0
+        playingSlider.value = 0
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -47,9 +57,6 @@ class PlayerControlPanel: NSObject {
 }
 
 extension PlayerControlPanel: DFPlayerControlable {
-    func titleForVideo() -> String {
-        return "video title"
-    }
     
     func setup() {
         container.df_addSubviews([playButton, fullScreenButton, titleLabel, currentSecondLabel, durationSecondsLabel, loadedProgress, playingSlider])
@@ -74,7 +81,6 @@ extension PlayerControlPanel: DFPlayerControlable {
             make.right.equalTo(container).offset(-60)
         }
         titleLabel.textColor = UIColor.whiteColor()
-        titleLabel.text = titleForVideo()
         titleLabel.textAlignment = .Center
         
         
@@ -85,7 +91,6 @@ extension PlayerControlPanel: DFPlayerControlable {
         }
         playButton.setImage(UIImage(named: "to_play"), forState: .Normal)
         playButton.setImage(UIImage(named: "to_pause"), forState: .Selected)
-        playButton.selected = false
         playButton.addAction({ [weak self](_) in
             guard let _self = self else { return }
             _self.delegate?.didPlayButtonTap()
@@ -99,7 +104,6 @@ extension PlayerControlPanel: DFPlayerControlable {
         }
         fullScreenButton.setImage(UIImage(named: "to_landscape"), forState: .Normal)
         fullScreenButton.setImage(UIImage(named: "to_portrait"), forState: .Selected)
-        fullScreenButton.selected = false
         
         fullScreenButton.addAction({ [weak self](sender) in
             guard let _self = self else { return }
@@ -124,7 +128,6 @@ extension PlayerControlPanel: DFPlayerControlable {
         }
         currentSecondLabel.font = UIFont.systemFontOfSize(12)
         currentSecondLabel.textColor = UIColor.whiteColor()
-        currentSecondLabel.text = "00:00"
         
         durationSecondsLabel.snp_makeConstraints { (make) in
             make.right.equalTo(fullScreenButton.snp_left).offset(-5)
@@ -132,7 +135,6 @@ extension PlayerControlPanel: DFPlayerControlable {
         }
         durationSecondsLabel.font = UIFont.systemFontOfSize(12)
         durationSecondsLabel.textColor = UIColor.whiteColor()
-        durationSecondsLabel.text = "00:00"
         
         loadedProgress.snp_makeConstraints { (make) in
             make.left.equalTo(currentSecondLabel.snp_right).offset(5)
@@ -143,12 +145,10 @@ extension PlayerControlPanel: DFPlayerControlable {
         
         loadedProgress.trackTintColor = UIColor.whiteColor()
         loadedProgress.progressTintColor = UIColor.greenColor()
-        loadedProgress.progress = 0
         
         playingSlider.snp_makeConstraints { (make) in
             make.edges.equalTo(loadedProgress)
         }
-        playingSlider.value = 0
         
         
         playingSlider.addAction({ [weak self](sender) in

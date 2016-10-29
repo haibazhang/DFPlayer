@@ -10,4 +10,11 @@ import UIKit
 
 protocol PlayerMasterDelegate: class {
 
+    func didReplayButtonTap()
 }
+
+extension PlayerMasterDelegate {
+    func didReplayButtonTap() {}
+    
+}
+

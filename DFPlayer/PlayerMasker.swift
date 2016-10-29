@@ -11,62 +11,83 @@ import UIKit
 class PlayerMasker: NSObject {
     let container = UIView()
     
-    lazy var stoppedStateView: UIView = {
-       let view = UIView()
-        view.backgroundColor = UIColor.blueColor()
+    lazy var stoppedMaskView: UIView = {
+        // ex. player init background
+        let view = UIImageView(image: UIImage(named: "background"))
+        view.contentMode = .ScaleAspectFit
         return view
     }()
     
-    var finishedStateView = UIView()
-    var errorStateView  = UIView()
-    var timeoutStateView = UIView()
+    lazy var startingMaskView: UIView = {
+       // ex. support AD
+       return UIView()
+    }()
     
-    lazy var pausedStateView: UIView = {
+    lazy var failedMaskView: UIView = {
+        // ex. support retry
+        let view = UIView()
+        view.backgroundColor = UIColor(red: 0.8, green: 0, blue: 0, alpha: 0.5)
+        
+        let label = UILabel()
+        label.textColor = UIColor.yellowColor()
+        label.text = "failed. (ex. support retry)"
+        label.textAlignment = .Center
+        view.df_addSubViewEquirotal(label)
+        
+        return view
+    }()
+    
+    lazy var playingMaskView: UIView = {
+        // ex. support bullet screen
+        return UIView()
+    }()
+    
+    lazy var pausedMaskView: UIView = {
+        // ex. support AD
         let view = UIView()
         view.backgroundColor = UIColor(red: 0, green: 0.3, blue: 0, alpha: 0.5)
-        return view
-    }()
-    
-    lazy var playingStateView: UIView = {
-        let view = UIView()
-//        let label = UILabel()
-//        view.addSubview(label)
-//        label.textColor = UIColor.whiteColor()
-//        label.font = UIFont.systemFontOfSize(13)
-//        label.text = "wow~ supporting bullet screen!!!"
-//        view.addSubview(label)
-//        label.snp_makeConstraints(closure: { (make) in
-//            make.centerY.equalTo(view)
-//            make.left.equalTo(view.snp_right)
-//            
-//        })
-//        NSTimer.scheduledTimerWithTimeInterval(3, action: { (_) in
-//            UIView.animateWithDuration(2) {
-//                label.snp_updateConstraints(closure: { (make) in
-//                    make.right.equalTo(view.snp_left)
-//                })
-//                view.layoutIfNeeded()
-//            }
-//            }, repeats: true)
-//        
         
-        view.backgroundColor = UIColor(red: 0.3, green: 0, blue: 0, alpha: 0.5)
+        let label = UILabel()
+        label.textColor = UIColor.yellowColor()
+        label.text = "pause. (ex. support AD)"
+        label.textAlignment = .Center
+        view.df_addSubViewEquirotal(label)
+        
         return view
     }()
     
+    lazy var timeoutMaskView: UIView = {
+        // ex. support retry
+        let view = UIView()
+        view.backgroundColor = UIColor(red: 0.5, green: 0, blue: 0, alpha: 0.5)
+        
+        let label = UILabel()
+        label.textColor = UIColor.yellowColor()
+        label.text = "timeout. (ex. support retry)"
+        label.textAlignment = .Center
+        view.df_addSubViewEquirotal(label)
+
+        return view
+    }()
+
+    lazy var finishedMaskView: UIView = {
+        // ex. support replay
+        let view = UIView()
+        view.backgroundColor = UIColor.blackColor()
+        let button = UIButton()
+        button.setImage(UIImage(named: "to_replay"), forState: .Normal)
+        button.addAction({ (_) in
+            self.delegate?.didReplayButtonTap()
+            }, forControlEvents: .TouchUpInside)
+        view.df_addSubViewEquirotal(button)
+        
+        return view
+    }()
     
     weak var delegate: PlayerMasterDelegate?
-    
-    override init() {
-        super.init()
-        setup()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
 }
 
 extension PlayerMasker: DFPlayerMaskable {
 }
+
+

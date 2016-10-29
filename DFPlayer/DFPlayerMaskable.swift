@@ -19,46 +19,31 @@ enum DFPlayerMaskViewType: String {
 protocol DFPlayerMaskable: class {
 //    var playerView: DFPlayerView { get }
     var container: UIView { get }
-    var stoppedStateView: UIView { get }
-    var finishedStateView: UIView { get }
-    var errorStateView: UIView { get }
-    var timeoutStateView: UIView { get }
-    var playingStateView: UIView { get }
-    var pausedStateView: UIView { get }
-    
-    func setup()
+    var stoppedMaskView: UIView { get }
+    var startingMaskView: UIView { get }
+    var failedMaskView: UIView { get }
+    var playingMaskView: UIView { get }
+    var pausedMaskView: UIView { get }
+    var timeoutMaskView: UIView { get }
+    var finishedMaskView: UIView { get }
     
     func installMaskView(state state: DFPlayerState)
 }
 
 extension DFPlayerMaskable {
     
-    func setup() {}
-    
     func installMaskView(state state: DFPlayerState) {
-        func removeAllMaskView() {
-            [stoppedStateView, finishedStateView, errorStateView, timeoutStateView, playingStateView].forEach { $0.removeFromSuperview() }
-        }
-
-        removeAllMaskView()
-        switch state {
-        case .Stopped:
-            container.df_addMaskView(stoppedStateView)
-            break
-        case .Failed:
-            container.df_addMaskView(errorStateView)
-            break
-        case .Playing:
-            container.df_addMaskView(playingStateView)
-            break
-        case .Paused:
-            container.df_addMaskView(pausedStateView)
-            break
-        case .Starting:
-            break
-        case .Init:
-            break
-        }
+        let map: [DFPlayerState: UIView] =
+                    [.Stopped: stoppedMaskView,
+                     .Starting: startingMaskView,
+                     .Failed: failedMaskView,
+                     .Playing: playingMaskView,
+                     .Paused: pausedMaskView,
+                     .Timeout: timeoutMaskView,
+                     .Finished: finishedMaskView,
+                     ]
+        container.subviews.forEach { $0.removeFromSuperview() }
+        container.df_addSubViewEquirotal(map[state] ?? UIView())
     }
 }
 
