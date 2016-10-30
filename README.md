@@ -1,16 +1,13 @@
 
-
 ### DFPlayer
-DFPlayer基于AVPlayer封装，支持播放、缓冲/进度显示、标题显示、暂停、载入动画、错误状态（timeout和刷新重播）、进度拖动、全屏等功能，并提供一个控制面板的默认实现。
-###### 几个特性包括：
-- 1）控制面板的UI控件可通过实现protocol方法来满足自定义需求；
-- 2）播放器和视频的可通过delegate监测来满足更多业务需求；
-- 3）提供常规配置，如自动播放、最小可自动播放缓冲等；
-- 4）Swift2.2 , iOS8+；
 
+![DFPlayer.gif](http://upload-images.jianshu.io/upload_images/636294-56844eb602480bfa.gif?imageMogr2/auto-orient/strip)
 
-### 0.01版本
-- 0.01版本提供一个从0开始的播放器雏形，只支持播放、缓冲/进度显示以及标题显示（如下图）。
-- 主要熟悉AVPlayer的基本使用方法，同时探索如何满足自定义控制面板的UI控件这个特性。
+DFPlayer基于AVPlayer封装，支持播放、暂停、重播、载入动画、进度控制（控件或手势）、横竖屏、标题显示、缓冲/进度显示、错误(failed/timeout)/暂停/播放中等遮罩页面显示等常见功能。
+几个特性包括：
+1）视频状态可通过delegate监测满足更多的业务需求；
+2）控制面板的UI控件可通过实现protocol方法来自定义；
+3）遮罩面板可自定义，满足各种状态下的需求，如失败时点击重试、暂停时展示广告，播放时显示弹幕等等；
+4）提供常规配置，如自动播放、日志打印；
+5）纯Swift编写（目前仅支持Swift2.3）
 
-![Paste_Image.png](http://upload-images.jianshu.io/upload_images/3024625-46338e3aa3b18d43.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
