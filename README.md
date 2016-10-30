@@ -1,7 +1,7 @@
 
 ### DFPlayer
 
-![DFPlayer.gif](http://upload-images.jianshu.io/upload_images/636294-56844eb602480bfa.gif?imageMogr2/auto-orient/strip)
+![DFPlayer.gif](http://upload-images.jianshu.io/upload_images/636294-d73a7c9c5253736c.gif?imageMogr2/auto-orient/strip)
 
 DFPlayer基于AVPlayer封装，支持播放、暂停、重播、载入动画、进度控制（控件或手势）、横竖屏、标题显示、缓冲/进度显示、错误(failed/timeout)/暂停/播放中等遮罩页面显示等常见功能。
 > 几个特性包括：
