@@ -58,7 +58,7 @@ class PlayerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor.whiteColor()
+        view.backgroundColor = UIColor.grayColor()
         
         setupPlayerView()
         setupBackButton()
@@ -114,12 +114,12 @@ class PlayerViewController: UIViewController {
         
         view.addSubview(nextMovie)
         nextMovie.snp_makeConstraints { (make) in
-            make.center.equalTo(view)
+            make.centerX.equalTo(view)
+            make.top.equalTo(player.playerView.snp_bottom)
             make.width.equalTo(150)
-            make.height.equalTo(44)
+            make.height.equalTo(60)
         }
-        nextMovie.setTitleColor(UIColor.blueColor(), forState: .Normal)
-        nextMovie.setTitle("next movie", forState: .Normal)
+        nextMovie.setTitle("Next", forState: .Normal)
         nextMovie.addAction({ [weak self](_) in
             guard let _self = self else { return }
             _self.autoPlay = true

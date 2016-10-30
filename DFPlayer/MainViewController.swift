@@ -15,7 +15,6 @@ class MainViewController: UIViewController {
     lazy var demoButton: UIButton = {
         let button = UIButton()
         button.setTitle("DFPlayer", forState: .Normal)
-        button.setTitleColor(UIColor.blueColor(), forState: .Normal)
         button.addAction({ (_) in
             let playerCtrl = PlayerViewController()
             self.navigationController?.pushViewController(playerCtrl, animated: true)
@@ -26,7 +25,7 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor.whiteColor()
+        view.backgroundColor = UIColor.grayColor()
         
         setupDemoButton()
     }
