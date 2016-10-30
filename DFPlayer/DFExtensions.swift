@@ -22,10 +22,10 @@ extension UIView {
         }
     }
     
-    // if width/height of hot spot less than 44 pixel, increase to 44 pixel
+    // increase width/height of hot spot to 80 pixel
     func df_containsPoint(bounds: CGRect, point: CGPoint) -> Bool {
-        let widthDelta = fmax(44 - bounds.width, 0)
-        let heightDelta = fmax(44 - bounds.height, 0)
+        let widthDelta = fmax(80 - bounds.width, 0)
+        let heightDelta = fmax(80 - bounds.height, 0)
         return CGRectContainsPoint(CGRectInset(bounds, -0.5 * widthDelta, -0.5 * heightDelta), point)
     }
 }

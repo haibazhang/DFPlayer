@@ -117,7 +117,7 @@ extension PlayerControlPanel: DFPlayerControlable {
         container.addGestureRecognizer(tapGR)
         
         panGR = UIPanGestureRecognizer { [weak self](gesture) in
-            guard let _self = self else { return }
+            guard let _self = self where _self.playingSlider.userInteractionEnabled else { return }
             if gesture.state == .Began {
                 _self.beganLocation = gesture.locationInView(_self.container)
                 _self.beginSliderValue = _self.playingSlider.value
@@ -139,7 +139,7 @@ extension PlayerControlPanel: DFPlayerControlable {
         container.addGestureRecognizer(panGR)
         
         tapGR.requireGestureRecognizerToFail(panGR)
-        
+
         
         container.df_addSubviews([playButton, fullScreenButton, titleLabel, silderTipLabel, currentSecondLabel, durationSecondsLabel, loadedProgress, playingSlider])
         
@@ -252,15 +252,16 @@ extension PlayerControlPanel: DFPlayerControlable {
     
     func show() {
         alreadyShow = true
-        UIView.animateWithDuration(0.5) {
+        UIView.animateWithDuration(0.3) {
             self.container.subviews.forEach({ $0.alpha = 1 })
         }
     }
     
     func dismiss() {
         alreadyShow = false
-        UIView.animateWithDuration(0.5) {
+        UIView.animateWithDuration(0.3) {
             self.container.subviews.forEach({ $0.alpha = 0 })
+            self.silderTipLabel.alpha = 1
         }
     }
 
@@ -284,6 +285,7 @@ extension PlayerControlPanel: DFPlayerControlable {
     }
 }
 
+
 class DFTimeSlider: UISlider {
     static let silderHeight: CGFloat = 2.5
     // custom height
@@ -294,8 +296,9 @@ class DFTimeSlider: UISlider {
     
     // increase click area("hot spot")
     override func pointInside(point: CGPoint, withEvent event: UIEvent?) -> Bool {
-        return df_containsPoint(bounds, point: point)
+        return self.df_containsPoint(bounds, point: point)
     }
+    
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -311,8 +314,10 @@ class DFTimeSlider: UISlider {
 
 class DFButton: UIButton {
     // increase click area("hot spot")
+    
     override func pointInside(point: CGPoint, withEvent event: UIEvent?) -> Bool {
-        return df_containsPoint(bounds, point: point)
+        return self.df_containsPoint(bounds, point: point)
     }
+
 }
 
