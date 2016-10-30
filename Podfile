@@ -4,4 +4,5 @@ use_frameworks!
 target 'DFPlayer' do
        pod 'SnapKit', '0.22.0'
        pod 'ReactiveUI', '0.0.3'
+       pod 'NVActivityIndicatorView', '2.10'
 end

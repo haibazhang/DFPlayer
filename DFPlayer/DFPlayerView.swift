@@ -8,27 +8,52 @@
 
 import UIKit
 import AVFoundation
+import NVActivityIndicatorView
 
 class DFPlayerView: UIView {
     deinit {
         print("deinit: - \(self)")
     }
     
-    internal var player: AVPlayer? {
+    let playerLayerView = DFPlayerLayerView()
+    
+    var player: AVPlayer? {
         get {
-            return (self.layer as! AVPlayerLayer).player
+            return (playerLayerView.layer as! AVPlayerLayer).player
         }
-        
         set {
-            (self.layer as! AVPlayerLayer).player = newValue
+            (playerLayerView.layer as! AVPlayerLayer).player = newValue
         }
     }
     
+    var loadingView: NVActivityIndicatorView? = nil {
+        didSet {
+            oldValue?.removeFromSuperview()
+            guard let loadingView = self.loadingView else { return }
+            self.addSubview(loadingView)
+            loadingView.snp_makeConstraints(closure: { (make) in
+                make.center.equalTo(self)
+                make.width.height.equalTo(36)
+            })
+        }
+    }
+    
+    internal init() {
+        super.init(frame: CGRectZero)
+        self.df_addSubViewEquirotal(playerLayerView)
+        self.backgroundColor = UIColor.blackColor()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+class DFPlayerLayerView: UIView {
     override class func layerClass() -> AnyClass {
         return AVPlayerLayer.self
     }
 }
-
 
 
 

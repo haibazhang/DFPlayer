@@ -1,15 +1,18 @@
 PODS:
+  - NVActivityIndicatorView (2.10)
   - ReactiveUI (0.0.3)
   - SnapKit (0.22.0)
 
 DEPENDENCIES:
+  - NVActivityIndicatorView (= 2.10)
   - ReactiveUI (= 0.0.3)
   - SnapKit (= 0.22.0)
 
 SPEC CHECKSUMS:
+  NVActivityIndicatorView: 5568608c3511690a42c4dd02f7a1de4361d670ae
   ReactiveUI: 05d1f5d884e5a2496a2cd2ac6c0ed35ab0218c02
   SnapKit: 0dd2fd157330f1ea11fd84da13e6be8a7a22bae0
 
-PODFILE CHECKSUM: 34e97bc147f20519b5ab5135305571cc0ba1c9ea
+PODFILE CHECKSUM: 701af5d3a7ed1fc62c3cc6b4c96442927d3f3f09
 
 COCOAPODS: 1.0.1
