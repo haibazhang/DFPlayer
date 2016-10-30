@@ -17,7 +17,6 @@ enum DFPlayerMaskViewType: String {
 }
 
 protocol DFPlayerMaskable: class {
-//    var playerView: DFPlayerView { get }
     var container: UIView { get }
     var stoppedMaskView: UIView { get }
     var startingMaskView: UIView { get }

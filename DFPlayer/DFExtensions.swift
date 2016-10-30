@@ -47,24 +47,30 @@ extension Int {
 extension UIDevice {
     
     class func df_isLandscape() -> Bool {
-        return UIDevice.currentDevice().orientation == .LandscapeLeft || UIDevice.currentDevice().orientation == .LandscapeRight
+        return UIDevice.currentDevice().orientation == .LandscapeLeft
+            || UIDevice.currentDevice().orientation == .LandscapeRight
     }
     
     class func df_isPortrait() -> Bool {
-        return UIDevice.currentDevice().orientation == .Portrait || UIDevice.currentDevice().orientation == .PortraitUpsideDown
+        return UIDevice.currentDevice().orientation == .Portrait
+            || UIDevice.currentDevice().orientation == .PortraitUpsideDown
     }
     
     
     class func df_toLandscape() {
         UIDevice.currentDevice().setValue(UIInterfaceOrientation.LandscapeRight.rawValue, forKey: "orientation")
-        UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: .Fade)
-        UIApplication.sharedApplication().setStatusBarOrientation(.LandscapeRight, animated: false)
+        if let rootCtrl = UIApplication.sharedApplication().keyWindow?.rootViewController {
+            RootCtrlSettings.prefersStatusBarHidden = true
+            rootCtrl.setNeedsStatusBarAppearanceUpdate()
+        }
     }
     
     class func df_toPortrait() {
         UIDevice.currentDevice().setValue(UIInterfaceOrientation.Portrait.rawValue, forKey: "orientation")
-        UIApplication.sharedApplication().setStatusBarHidden(false, withAnimation: .Fade)
-        UIApplication.sharedApplication().setStatusBarOrientation(.Portrait, animated: false)
+        if let rootCtrl = UIApplication.sharedApplication().keyWindow?.rootViewController {
+            RootCtrlSettings.prefersStatusBarHidden = false
+            rootCtrl.setNeedsStatusBarAppearanceUpdate()
+        }
     }
 }
 

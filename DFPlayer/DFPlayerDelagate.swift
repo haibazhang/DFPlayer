@@ -13,7 +13,6 @@ protocol DFPlayerDelagate: class {
     func shouldAutoPlay() -> Bool
     func shouldLog() -> Bool
     func timeoutInterval() -> NSTimeInterval
-    
     func playerStateDidChange(state: DFPlayerState)
     func durationSeconds(second: NSTimeInterval)
     func loadedSecondsDidChange(seconds: NSTimeInterval)

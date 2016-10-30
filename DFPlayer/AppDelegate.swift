@@ -25,13 +25,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 
-class GlobalSettings {
+class RootCtrlSettings {
     static var shouldAutorotate: Bool = false
+    static var prefersStatusBarHidden: Bool = false
 }
 
 class DFNavigationController: UINavigationController {
     override func shouldAutorotate() -> Bool {
-        return GlobalSettings.shouldAutorotate
+        return RootCtrlSettings.shouldAutorotate
+    }
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return RootCtrlSettings.prefersStatusBarHidden
     }
 }
 

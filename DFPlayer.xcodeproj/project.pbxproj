@@ -13,7 +13,6 @@
 		50A169B21DAFBCDC002DE4FC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50A169B11DAFBCDC002DE4FC /* Assets.xcassets */; };
 		50A169B51DAFBCDC002DE4FC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 50A169B31DAFBCDC002DE4FC /* LaunchScreen.storyboard */; };
 		50A169C01DAFC4CF002DE4FC /* DFPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169BF1DAFC4CF002DE4FC /* DFPlayerView.swift */; };
-		50A169C21DAFCA7B002DE4FC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169C11DAFCA7B002DE4FC /* Constants.swift */; };
 		50A169C41DB06ADD002DE4FC /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169C31DB06ADD002DE4FC /* MainViewController.swift */; };
 		50A169CA1DB0725F002DE4FC /* DFPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169C91DB0725F002DE4FC /* DFPlayer.swift */; };
 		50A169CC1DB14639002DE4FC /* DFPlayerControlable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A169CB1DB14639002DE4FC /* DFPlayerControlable.swift */; };
@@ -36,7 +35,6 @@
 		50A169B41DAFBCDC002DE4FC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		50A169B61DAFBCDC002DE4FC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50A169BF1DAFC4CF002DE4FC /* DFPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerView.swift; sourceTree = "<group>"; };
-		50A169C11DAFCA7B002DE4FC /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		50A169C31DB06ADD002DE4FC /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		50A169C91DB0725F002DE4FC /* DFPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayer.swift; sourceTree = "<group>"; };
 		50A169CB1DB14639002DE4FC /* DFPlayerControlable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFPlayerControlable.swift; sourceTree = "<group>"; };
@@ -99,7 +97,6 @@
 				50A169DF1DBBAFDF002DE4FC /* PlayerControlPanelDelegate.swift */,
 				50A169E31DBF14C0002DE4FC /* PlayerMasker.swift */,
 				5097AEB81DBFB87E009AD63D /* PlayerMasterDelegate.swift */,
-				50A169C11DAFCA7B002DE4FC /* Constants.swift */,
 				50A169B11DAFBCDC002DE4FC /* Assets.xcassets */,
 				50A169B31DAFBCDC002DE4FC /* LaunchScreen.storyboard */,
 				50A169B61DAFBCDC002DE4FC /* Info.plist */,
@@ -261,7 +258,6 @@
 				50A169CC1DB14639002DE4FC /* DFPlayerControlable.swift in Sources */,
 				50A169D81DB93ED8002DE4FC /* DFExtensions.swift in Sources */,
 				50A169AB1DAFBCDC002DE4FC /* AppDelegate.swift in Sources */,
-				50A169C21DAFCA7B002DE4FC /* Constants.swift in Sources */,
 				50A169CA1DB0725F002DE4FC /* DFPlayer.swift in Sources */,
 				50A169CE1DB4D25D002DE4FC /* DFPlayerDelagate.swift in Sources */,
 			);

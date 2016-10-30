@@ -14,8 +14,8 @@ import NVActivityIndicatorView
 
 let movies: [(String, String)] = [
     ("http://www.html5videoplayer.net/videos/toystory.mp4", "Toy Story"),
-    ("https://media.w3.org/2010/05/sintel/trailer.mp4", "Unknown"),
     ("http://techslides.com/demos/sample-videos/small.mp4", "Short Test"),
+    ("https://media.w3.org/2010/05/sintel/trailer.mp4", "Unknown"),
     ("http://demo.codesamplez.com/html5/video/sample.mp4", "Fail/Timeout Test")
 ]
 
@@ -53,7 +53,7 @@ class PlayerViewController: UIViewController {
     
     let backButton = UIButton()
     let nextMovie = UIButton()
-    var isSilderTouching = false
+    var autoPlay = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,18 +70,20 @@ class PlayerViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: true)
-        GlobalSettings.shouldAutorotate = true
+        RootCtrlSettings.shouldAutorotate = true
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(false, animated: true)
-        GlobalSettings.shouldAutorotate = false
+        RootCtrlSettings.shouldAutorotate = false
     }
     
     func setupPlayerView() {
         let supView = view
         supView.addSubview(player.playerView)
+        let screenWidth = UIScreen.mainScreen().bounds.width
+        let screenHeight = UIScreen.mainScreen().bounds.height
         player.playerView.snp_makeConstraints { (make) in
             make.top.left.right.equalTo(supView)
             make.height.equalTo(supView.snp_width).multipliedBy(screenWidth/screenHeight)
@@ -109,6 +111,7 @@ class PlayerViewController: UIViewController {
     }
     
     func setupNextMovieButton() {
+        
         view.addSubview(nextMovie)
         nextMovie.snp_makeConstraints { (make) in
             make.center.equalTo(view)
@@ -119,6 +122,7 @@ class PlayerViewController: UIViewController {
         nextMovie.setTitle("next movie", forState: .Normal)
         nextMovie.addAction({ [weak self](_) in
             guard let _self = self else { return }
+            _self.autoPlay = true
             _self.movieIndex = (_self.movieIndex+1) % movies.count
             _self.ctrlPanel.clear()
             }, forControlEvents: .TouchUpInside)
@@ -131,7 +135,7 @@ class PlayerViewController: UIViewController {
 
 extension PlayerViewController: DFPlayerDelagate {
     func shouldAutoPlay() -> Bool {
-        return true
+        return autoPlay
     }
     
     func shouldLog() -> Bool {

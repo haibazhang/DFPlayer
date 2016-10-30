@@ -26,7 +26,9 @@ protocol DFPlayerControlable: class {
 
     /* for layout & style */
     func setup()
+    
     func show()
+    
     func dismiss()    
 }
 
