@@ -14,7 +14,9 @@ import NVActivityIndicatorView
 
 let movies: [(String, String)] = [
     ("http://www.html5videoplayer.net/videos/toystory.mp4", "Toy Story"),
-    ("http://clips.vorwaerts-gmbh.de/VfE_html5.mp4", "Unknown Movie"),
+    ("https://media.w3.org/2010/05/sintel/trailer.mp4", "Unknown"),
+    ("http://techslides.com/demos/sample-videos/small.mp4", "Short Test"),
+    ("http://demo.codesamplez.com/html5/video/sample.mp4", "Fail/Timeout Test")
 ]
 
 class PlayerViewController: UIViewController {
@@ -110,13 +112,15 @@ class PlayerViewController: UIViewController {
         view.addSubview(nextMovie)
         nextMovie.snp_makeConstraints { (make) in
             make.center.equalTo(view)
-            make.width.height.equalTo(150)
+            make.width.equalTo(150)
+            make.height.equalTo(44)
         }
         nextMovie.setTitleColor(UIColor.blueColor(), forState: .Normal)
         nextMovie.setTitle("next movie", forState: .Normal)
         nextMovie.addAction({ [weak self](_) in
             guard let _self = self else { return }
             _self.movieIndex = (_self.movieIndex+1) % movies.count
+            _self.ctrlPanel.clear()
             }, forControlEvents: .TouchUpInside)
     }
     
@@ -126,8 +130,20 @@ class PlayerViewController: UIViewController {
 }
 
 extension PlayerViewController: DFPlayerDelagate {
+    func shouldAutoPlay() -> Bool {
+        return true
+    }
+    
+    func shouldLog() -> Bool {
+        return true
+    }
+
     func playerStateDidChange(state: DFPlayerState) {
         self.ctrlPanel.container.hidden = (state == .Finished)
+    }
+    
+    func durationSeconds(second: NSTimeInterval) {
+        self.ctrlPanel.movieDuration = second
     }
 }
 
@@ -151,7 +167,7 @@ extension PlayerViewController: PlayerControlPanelDelegate {
     }
     
     func didSliderTouchEnd(sender: UISlider) {
-        let endTime = Double(sender.value) * player.itemDurationSeconds
+        let endTime = Int(Double(sender.value) * player.itemDurationSeconds)
         player.seek(endTime)
     }
 }

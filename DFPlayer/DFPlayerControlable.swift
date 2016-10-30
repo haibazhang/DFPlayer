@@ -16,6 +16,7 @@ protocol DFPlayerControlable: class {
     var playButton: UIButton { get }
     var fullScreenButton: UIButton { get }
     var titleLabel: UILabel { get }
+    var silderTipLabel: UILabel { get }
     var currentSecondLabel: UILabel { get }
     var durationSecondsLabel: UILabel { get }
     var loadedProgress: UIProgressView { get }

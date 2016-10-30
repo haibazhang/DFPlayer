@@ -10,6 +10,10 @@ import UIKit
 
 protocol DFPlayerDelagate: class {
     // @optional
+    func shouldAutoPlay() -> Bool
+    func shouldLog() -> Bool
+    func timeoutInterval() -> NSTimeInterval
+    
     func playerStateDidChange(state: DFPlayerState)
     func durationSeconds(second: NSTimeInterval)
     func loadedSecondsDidChange(seconds: NSTimeInterval)
@@ -20,6 +24,15 @@ protocol DFPlayerDelagate: class {
 }
 
 extension DFPlayerDelagate {
+    func shouldAutoPlay() -> Bool {
+        return false
+    }
+    func shouldLog() -> Bool {
+        return true
+    }
+    func timeoutInterval() -> NSTimeInterval {
+        return 15
+    }
     func playerStateDidChange(state: DFPlayerState) {}
     func durationSeconds(seconds: NSTimeInterval) {}
     func loadedSecondsDidChange(seconds: NSTimeInterval) {}

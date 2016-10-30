@@ -11,17 +11,21 @@ import NVActivityIndicatorView
 
 class PlayerControlPanel: NSObject {
     let container = UIView()
+    
     let playButton: UIButton = {
         return DFButton()
     }()
+    
     let backButton: UIButton = {
         return DFButton()
     }()
+    
     let fullScreenButton: UIButton = {
         return DFButton()
     }()
     
     let titleLabel = UILabel()
+    let silderTipLabel = UILabel()
     let currentSecondLabel = UILabel()
     let durationSecondsLabel = UILabel()
     let loadedProgress = UIProgressView()
@@ -30,17 +34,50 @@ class PlayerControlPanel: NSObject {
         return DFTimeSlider()
     }()
     
-    var isSliderTouching = false
-    var alreadyShow = true
-    
-    weak var delegate: PlayerControlPanelDelegate?
-    
-    override init() {
-        super.init()
-        setup()
-        clear()
+    var isSliderTouching = false {
+        didSet {
+            if isSliderTouching {
+                self.removeTimer()
+            } else {
+                self.addTimer()
+            }
+        }
+    }
+    var alreadyShow = true {
+        didSet {
+            if alreadyShow {
+                self.addTimer()
+            } else {
+                self.removeTimer()
+            }
+        }
     }
     
+    weak var delegate: PlayerControlPanelDelegate?
+
+    
+    private var beganLocation = CGPointZero
+    private var beginSliderValue: Float = 0
+    
+    var movieDuration: NSTimeInterval = 0
+    
+    var autoDismissTimeInterval: NSTimeInterval = 4
+    
+    private var dismissTimer: NSTimer?
+    
+    func addTimer() {
+        dismissTimer = NSTimer.scheduledTimerWithTimeInterval(self.autoDismissTimeInterval, action: { [weak self](_) in
+            guard let _self = self else { return }
+            if _self.alreadyShow {
+                _self.dismiss()
+            }
+            }, repeats: false)
+    }
+    
+    func removeTimer() {
+        dismissTimer?.invalidate()
+    }
+
     func clear() {
         playButton.selected = false
         fullScreenButton.selected = false
@@ -48,6 +85,15 @@ class PlayerControlPanel: NSObject {
         durationSecondsLabel.text = "00:00"
         loadedProgress.progress = 0
         playingSlider.value = 0
+    }
+    
+    var tapGR: UITapGestureRecognizer!
+    var panGR: UIPanGestureRecognizer!
+
+    override init() {
+        super.init()
+        setup()
+        clear()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -59,30 +105,43 @@ class PlayerControlPanel: NSObject {
 extension PlayerControlPanel: DFPlayerControlable {
     
     func setup() {
-        container.df_addSubviews([playButton, fullScreenButton, titleLabel, currentSecondLabel, durationSecondsLabel, loadedProgress, playingSlider])
-        
-//                let tapGR = UITapGestureRecognizer { [weak self](_) in
-//                    guard let _self = self else { return }
-//                    if _self.alreadyShow {
-//                        _self.dismiss()
-//                    } else {
-//                        _self.show()
-//                    }
-//                    _self.delegate?.didControlPanelTap()
-//                }
-//                container.addGestureRecognizer(tapGR)
-        
-        
-        
-        titleLabel.snp_makeConstraints { (make) in
-            make.centerY.equalTo(container.snp_top).offset(64/2)
-            make.centerX.equalTo(container)
-            make.left.equalTo(container).offset(60)
-            make.right.equalTo(container).offset(-60)
+        tapGR = UITapGestureRecognizer { [weak self](_) in
+            guard let _self = self else { return }
+            if _self.alreadyShow {
+                _self.dismiss()
+            } else {
+                _self.show()
+            }
+            _self.delegate?.didControlPanelTap()
         }
-        titleLabel.textColor = UIColor.whiteColor()
-        titleLabel.textAlignment = .Center
+        container.addGestureRecognizer(tapGR)
         
+        panGR = UIPanGestureRecognizer { [weak self](gesture) in
+            guard let _self = self else { return }
+            if gesture.state == .Began {
+                _self.beganLocation = gesture.locationInView(_self.container)
+                _self.beginSliderValue = _self.playingSlider.value
+                _self.slideBegan()
+            } else if gesture.state == .Changed {
+                gesture.locationInView(_self.container)
+                let curLocation = gesture.locationInView(_self.container)
+                let gap = curLocation.x - _self.beganLocation.x
+                if fabs(gap) > 0 {
+                    let rate = gap/_self.container.bounds.width
+                    let newValue = _self.beginSliderValue + Float(0.2*rate)
+                    _self.playingSlider.value = newValue < 1 ? newValue : 1
+                }
+                _self.slideMovie()
+            } else if gesture.state == .Ended {
+                _self.slideEnded()
+            }
+        }
+        container.addGestureRecognizer(panGR)
+        
+        tapGR.requireGestureRecognizerToFail(panGR)
+        
+        
+        container.df_addSubviews([playButton, fullScreenButton, titleLabel, silderTipLabel, currentSecondLabel, durationSecondsLabel, loadedProgress, playingSlider])
         
         playButton.snp_makeConstraints { (make) in
             make.left.equalTo(container).offset(16)
@@ -93,6 +152,11 @@ extension PlayerControlPanel: DFPlayerControlable {
         playButton.setImage(UIImage(named: "to_pause"), forState: .Selected)
         playButton.addAction({ [weak self](_) in
             guard let _self = self else { return }
+            _self.removeTimer()
+            }, forControlEvents: .TouchDown)
+        playButton.addAction({ [weak self](_) in
+            guard let _self = self else { return }
+            _self.addTimer()
             _self.delegate?.didPlayButtonTap()
             }, forControlEvents: .TouchUpInside)
         
@@ -105,8 +169,13 @@ extension PlayerControlPanel: DFPlayerControlable {
         fullScreenButton.setImage(UIImage(named: "to_landscape"), forState: .Normal)
         fullScreenButton.setImage(UIImage(named: "to_portrait"), forState: .Selected)
         
+        fullScreenButton.addAction({ [weak self](_) in
+            guard let _self = self else { return }
+            _self.removeTimer()
+            }, forControlEvents: .TouchDown)
         fullScreenButton.addAction({ [weak self](sender) in
             guard let _self = self else { return }
+            _self.addTimer()
             guard let button = sender as? UIButton else { return }
             _self.delegate?.didFullScreenTap(button)
             if !sender.selected {
@@ -114,12 +183,25 @@ extension PlayerControlPanel: DFPlayerControlable {
             } else {
                 UIDevice.df_toPortrait()
             }
-            
             _self.delegate?.didFullScreenTap(button)
-            
             sender.selected = !sender.selected
-            
             }, forControlEvents: .TouchUpInside)
+        
+        titleLabel.snp_makeConstraints { (make) in
+            make.centerY.equalTo(container.snp_top).offset(64/2)
+            make.centerX.equalTo(container)
+            make.left.equalTo(container).offset(60)
+            make.right.equalTo(container).offset(-60)
+        }
+        titleLabel.textColor = UIColor.whiteColor()
+        titleLabel.textAlignment = .Center
+        
+        silderTipLabel.snp_makeConstraints { (make) in
+            make.center.equalTo(container)
+        }
+        silderTipLabel.font = UIFont.boldSystemFontOfSize(20)
+        silderTipLabel.textColor = UIColor.whiteColor()
+        silderTipLabel.textAlignment = .Center
         
         currentSecondLabel.snp_makeConstraints { (make) in
             make.left.equalTo(playButton.snp_right).offset(5)
@@ -153,25 +235,19 @@ extension PlayerControlPanel: DFPlayerControlable {
         
         playingSlider.addAction({ [weak self](sender) in
             guard let _self = self else { return }
-            guard let slider = sender as? UISlider else { return }
-            _self.isSliderTouching = true
-            _self.delegate?.didSliderTouchBegin(slider)
-            
+            _self.slideBegan()
             }, forControlEvents: .TouchDown)
+        
         
         playingSlider.addAction({ [weak self](sender) in
             guard let _self = self else { return }
-            guard let slider = sender as? UISlider else { return }
-            _self.delegate?.didSliderTouchMovie(slider)
+            _self.slideMovie()
             }, forControlEvents: .ValueChanged)
         
         playingSlider.addAction({ [weak self](sender) in
             guard let _self = self else { return }
-            guard let slider = sender as? UISlider else { return }
-            _self.isSliderTouching = false
-            _self.delegate?.didSliderTouchEnd(slider)
-            }, forControlEvents: .TouchUpInside)
-        
+            _self.slideEnded()
+            }, forControlEvents: [.TouchUpInside, .TouchUpOutside])
     }
     
     func show() {
@@ -188,6 +264,24 @@ extension PlayerControlPanel: DFPlayerControlable {
         }
     }
 
+    private func slideBegan() {
+        container.removeGestureRecognizer(tapGR)
+        isSliderTouching = true
+        silderTipLabel.hidden = false
+        delegate?.didSliderTouchBegin(playingSlider)
+    }
+    
+    private func slideMovie() {
+        silderTipLabel.text = Int(Double(playingSlider.value) * movieDuration).df_toHourFormat()
+        delegate?.didSliderTouchMovie(playingSlider)
+    }
+    
+    private func slideEnded() {
+        container.addGestureRecognizer(tapGR)
+        isSliderTouching = false
+        silderTipLabel.hidden = true
+        delegate?.didSliderTouchEnd(playingSlider)
+    }
 }
 
 class DFTimeSlider: UISlider {
