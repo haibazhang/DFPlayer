@@ -15,8 +15,6 @@ class DFPlayerView: UIView {
         print("deinit: - \(self)")
     }
     
-    let playerLayerView = DFPlayerLayerView()
-    
     var player: AVPlayer? {
         get {
             return (playerLayerView.layer as! AVPlayerLayer).player
@@ -38,6 +36,8 @@ class DFPlayerView: UIView {
         }
     }
     
+    private let playerLayerView = DFPlayerLayerView()
+    
     internal init() {
         super.init(frame: CGRectZero)
         self.df_addSubViewEquirotal(playerLayerView)
@@ -49,7 +49,7 @@ class DFPlayerView: UIView {
     }
 }
 
-class DFPlayerLayerView: UIView {
+private class DFPlayerLayerView: UIView {
     override class func layerClass() -> AnyClass {
         return AVPlayerLayer.self
     }

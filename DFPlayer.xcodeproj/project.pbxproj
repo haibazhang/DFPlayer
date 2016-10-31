@@ -107,8 +107,8 @@
 		50A169BE1DAFC3C1002DE4FC /* Player */ = {
 			isa = PBXGroup;
 			children = (
-				50A169BF1DAFC4CF002DE4FC /* DFPlayerView.swift */,
 				50A169C91DB0725F002DE4FC /* DFPlayer.swift */,
+				50A169BF1DAFC4CF002DE4FC /* DFPlayerView.swift */,
 				50A169CD1DB4D25D002DE4FC /* DFPlayerDelagate.swift */,
 				50A169CB1DB14639002DE4FC /* DFPlayerControlable.swift */,
 				50A169E11DBF1492002DE4FC /* DFPlayerMaskable.swift */,

@@ -25,6 +25,48 @@ private let status = "status"
 private let stateQueue = dispatch_queue_create("com.difff.stateQueue", nil)
 
 class DFPlayer: NSObject {
+    
+    internal weak var controlable: DFPlayerControlable? {
+        willSet {
+            controlable?.container.removeFromSuperview()
+        }
+        didSet {
+            guard let container = controlable?.container else { return }
+            playerView.df_addSubViewEquirotal(container)
+        }
+    }
+    internal weak var maskable: DFPlayerMaskable? {
+        willSet {
+            maskable?.container.removeFromSuperview()
+        }
+        didSet {
+            guard let container = maskable?.container else { return }
+            playerView.df_addSubViewEquirotal(container)
+            if let ctrlPanel = controlable?.container {
+                playerView.bringSubviewToFront(ctrlPanel)
+            }
+        }
+    }
+    
+    internal var loadingView: NVActivityIndicatorView?
+    
+    internal var playerItem: AVPlayerItem? = nil {
+        willSet {
+            removeObserverForPlayItemStatus()
+        }
+        didSet {
+            addObserverForPlayItemStatus()
+            
+            guard let playerItem = self.playerItem else { return }
+            playerView.player = AVPlayer(playerItem: playerItem)
+            playerView.loadingView = loadingView
+            if delegate.shouldAutoPlay() {
+                start()
+            } else {
+                stop()
+            }
+        }
+    }
 
     private(set) var playerView = DFPlayerView()
     
@@ -81,8 +123,6 @@ class DFPlayer: NSObject {
             }
         }
     }
-    
-    private var timeOutTimer: NSTimer?
     
     private(set) var isLoading: Bool = false {
         willSet {
@@ -172,71 +212,19 @@ class DFPlayer: NSObject {
     }
 
     private(set) var seeking = false
-    
     private weak var delegate: DFPlayerDelagate!
-    
-    internal weak var controlable: DFPlayerControlable? {
-        willSet {
-            controlable?.container.removeFromSuperview()
-        }
-        didSet {
-            guard let container = controlable?.container else { return }
-            playerView.df_addSubViewEquirotal(container)
-            playerView.bringSubviewToFront(container)
-        }
-    }
-    internal weak var maskable: DFPlayerMaskable? {
-        willSet {
-            maskable?.container.removeFromSuperview()
-        }
-        didSet {
-            guard let container = maskable?.container else { return }
-            playerView.df_addSubViewEquirotal(container)
-            playerView.sendSubviewToBack(container)
-            playerView.sendSubviewToBack(playerView.playerLayerView)
-            /* view Cascading Relation:
-             --------controlable?.container---------
-             ---------maskable?.contrainer----------
-             -------playView.playerLayerView--------
-             */
-        }
-    }
-    
-    internal var loadingView: NVActivityIndicatorView?
-    
-    internal var playerItem: AVPlayerItem? = nil {
-        willSet {
-            removeObserverForPlayItemStatus()
-        }
-        
-        didSet {
-            addObserverForPlayItemStatus()
-            
-            guard let playerItem = self.playerItem else { return }
-            playerView.player = AVPlayer(playerItem: playerItem)
-            playerView.loadingView = loadingView
-            if delegate.shouldAutoPlay() {
-                start()
-            } else {
-                stop()
-            }
-        }
-    }
-
-    
     private var timer: NSTimer?
-
-    override init() {
-        fatalError("use init(:AVPlayerItem)")
-    }
+    private var timeOutTimer: NSTimer?
     
     deinit {
         print("deinit: - \(self)")
         removeObserverForPlayItemStatus()
         removeTimer()
     }
-
-    init(delegate: DFPlayerDelagate) {
+    
+    override private init() {}
+    
+    internal init(delegate: DFPlayerDelagate) {
         super.init()
         self.delegate = delegate
     }
@@ -247,7 +235,6 @@ class DFPlayer: NSObject {
         }
         state = .Stopped
     }
-    
     
     internal func start() {
         isFinished = false
@@ -287,16 +274,6 @@ class DFPlayer: NSObject {
         df_print("DFPlayer: >>>>>> seeking begin - \(seekSecond) second")
         seeking = true
         let time = CMTime(value: Int64(seekSecond), timescale: 1)
-//        dispatch_async(dispatch_get_main_queue()) {
-//        }
-        
-        
-//        self.playerView.player?.seekToTime(time, completionHandler: { [weak self](_) in
-//            guard let _self = self else { return }
-//            _self.seeking = false
-//            _self.df_print("DFPlayer: <<<<<< seeking end")
-//            })
-
         self.playerView.player?.seekToTime(time, toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimePositiveInfinity, completionHandler: { [weak self](_) in
             guard let _self = self else { return }
             _self.seeking = false
@@ -422,7 +399,7 @@ class DFPlayer: NSObject {
     }
 }
 
-extension DFPlayer {
+private extension DFPlayer {
     func df_print(str: String) {
         if delegate.shouldLog() {
             print(str)
