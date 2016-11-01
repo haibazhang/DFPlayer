@@ -156,7 +156,6 @@ class DFPlayer: NSObject {
             if newValue {
                 self.pause()
                 self.setFinished()
-                self.delegate?.didFinished()
             }
         }
     }

@@ -26,8 +26,8 @@ class PlayerViewController: UIViewController {
     
     var movieIndex = -1 {
         didSet {
-            self.player.playerItem = AVPlayerItem(URL: NSURL(string: movies[self.movieIndex].0)!)
-            self.ctrlPanel.titleLabel.text = movies[self.movieIndex].1
+            player.playerItem = AVPlayerItem(URL: NSURL(string: movies[movieIndex].0)!)
+            ctrlPanel.titleLabel.text = movies[movieIndex].1
         }
     }
     

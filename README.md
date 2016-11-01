@@ -1,5 +1,4 @@
-
-### DFPlayer
+####简介：
 
 ![DFPlayer.gif](http://upload-images.jianshu.io/upload_images/636294-d73a7c9c5253736c.gif?imageMogr2/auto-orient/strip)
 
